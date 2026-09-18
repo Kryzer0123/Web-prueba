@@ -237,10 +237,9 @@
       </div>
     </section>
 
-    <!-- SECCIÓN DE FACCIONES & ENTORNO (DISEÑO ESTILO IMAGEN + GESTIÓN DE IMÁGENES) -->
+    <!-- SECCIÓN DE FACCIONES & ENTORNO -->
     <section class="py-20 px-4 max-w-7xl mx-auto w-full relative z-10 border-t border-slate-800/80">
       <div class="space-y-6">
-        <!-- Pestañas superiores y botón de añadir imagen exclusivo para Staff -->
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div class="flex flex-wrap items-center gap-3">
             <button onclick="switchFeatureTab('facciones')" id="tab-btn-facciones" class="feature-tab-btn px-6 py-2.5 rounded-full text-xs font-extrabold transition-all bg-[#241c0c] text-[#facc15] border border-[#facc15]/50 shadow-[0_0_15px_rgba(250,204,21,0.2)]">
@@ -267,16 +266,13 @@
           </div>
         </div>
 
-        <!-- Descripción dinámica superior -->
         <div class="max-w-4xl">
           <p id="featureDescriptionText" class="text-slate-300 text-sm sm:text-base leading-relaxed font-medium">
             Policía, médicos, bomberos, gobierno, prensa, noticieros, restaurantes, mecánicos, concesionarios, ammunations, discotecas y mucho más: cada facción con sus propios sistemas inmersivos para vivir el rol como nunca.
           </p>
         </div>
 
-        <!-- Contenedor principal de la galería estilo Grid Split (Imagen Grande + Miniaturas) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
-          <!-- Imagen Principal Grande (Izquierda - 8 columnas) -->
           <div class="lg:col-span-8 rounded-3xl overflow-hidden glass-card border border-slate-800 relative h-[360px] sm:h-[480px]">
             <img id="mainFeatureDisplayImg" src="https://images.unsplash.com/photo-1555848962-6e79363ec58f?auto=format&fit=crop&w=1200&q=80" alt="Vista Principal" class="w-full h-full object-cover transition-all duration-500" />
             <div class="absolute inset-0 bg-gradient-to-t from-[#0b0e14]/80 via-transparent to-transparent"></div>
@@ -287,7 +283,6 @@
             </div>
           </div>
 
-          <!-- Cuadrícula de Miniaturas (Derecha - 4 columnas) -->
           <div id="featureThumbnailsContainer" class="lg:col-span-4 grid grid-cols-2 gap-3 content-start max-h-[360px] sm:max-h-[480px] overflow-y-auto pr-1"></div>
         </div>
       </div>
@@ -364,7 +359,6 @@
         <p class="text-slate-400 text-sm mt-2">Rellena el siguiente test de conceptos, la historia de tu personaje y los casos prácticos.</p>
       </div>
 
-      <!-- BOTONES COMPLETAMENTE SEPARADOS PARA EL MODO STAFF -->
       <div id="staffWhitelistToolbar" class="hidden flex flex-wrap items-center gap-2">
         <button onclick="openAddCategoryModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs transition-all duration-300 shadow-lg shadow-brand-600/30 flex items-center gap-2">
           <i class="fa-solid fa-folder-plus"></i> Nueva Categoría
@@ -423,7 +417,6 @@
           </div>
         </div>
 
-        <!-- SECCIÓN FIJA: FICHA E HISTORIA DEL PERSONAJE (IC) -->
         <div class="border-t border-slate-800/80 pt-6 space-y-4">
           <h3 class="text-lg font-black text-sky-400 mb-4 flex items-center gap-2">
             <span class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-xs">2</span> Ficha e Historia del Personaje (IC)
@@ -453,7 +446,6 @@
           </div>
         </div>
 
-        <!-- CONTENEDOR DINÁMICO DE CATEGORÍAS Y PREGUNTAS ADICIONALES -->
         <div id="dynamicCategoriesContainer" class="space-y-8"></div>
 
         <div class="pt-4 border-t border-slate-800 flex items-center justify-end">
@@ -574,7 +566,7 @@
     </div>
   </div>
 
-  <!-- MODALS & OVERLAYS -->
+  <!-- MODAL DE ACCESO ADMIN -->
   <div id="adminPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 transition-all duration-300 opacity-0 scale-95">
     <div class="glass-card rounded-2xl border border-brand-500/40 max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
       <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
@@ -604,7 +596,7 @@
     </div>
   </div>
 
-  <!-- MODAL PARA AÑADIR/EDITAR CATEGORÍA -->
+  <!-- MODAL CATEGORÍA -->
   <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
     <div class="glass-card rounded-2xl border border-brand-500/40 max-w-md w-full p-6 sm:p-8 shadow-2xl relative my-8">
       <button onclick="closeCategoryModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
@@ -636,7 +628,7 @@
     </div>
   </div>
 
-  <!-- MODAL MEJORADO PARA AÑADIR/EDITAR PREGUNTA -->
+  <!-- MODAL PREGUNTA -->
   <div id="addQuestionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
     <div class="glass-card rounded-2xl border border-emerald-500/40 max-w-lg w-full p-6 sm:p-8 shadow-2xl relative my-8">
       <button onclick="closeAddQuestionModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
@@ -685,6 +677,7 @@
     </div>
   </div>
 
+  <!-- MODAL REGLA -->
   <div id="ruleFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
     <div class="glass-card rounded-2xl border border-brand-500/40 max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
       <button onclick="closeRuleModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
@@ -753,6 +746,7 @@
     </div>
   </div>
 
+  <!-- MODAL PARCHE -->
   <div id="patchFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
     <div class="glass-card rounded-2xl border border-emerald-500/40 max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
       <button onclick="closePatchModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
@@ -985,6 +979,7 @@
 
     function initParticleCanvas() {
       const canvas = document.getElementById('particleCanvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
       let width = canvas.width = window.innerWidth;
       let height = canvas.height = window.innerHeight;
@@ -1167,7 +1162,6 @@
         thumbsContainer.appendChild(thumbDiv);
       });
 
-      // Establecer la primera por defecto
       if (items.length > 0) {
         document.getElementById('mainFeatureDisplayImg').src = items[0].img;
         document.getElementById('mainFeatureCaption').textContent = items[0].title;
@@ -1771,48 +1765,36 @@
               ` : ''}
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-4 text-sm text-slate-300">
               ${patch.added && patch.added.length > 0 ? `
                 <div>
-                  <h4 class="text-xs font-black uppercase tracking-wider text-emerald-400 mb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-plus-circle"></i> Novedades Añadidas
+                  <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle"></i> Nuevas Características
                   </h4>
                   <ul class="space-y-1.5 pl-2">
-                    ${patch.added.map(item => `
-                      <li class="text-xs sm:text-sm text-slate-300 flex items-start gap-2">
-                        <span class="text-emerald-400 font-bold">•</span> <span>${escapeHTML(item)}</span>
-                      </li>
-                    `).join('')}
+                    ${patch.added.map(a => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-emerald-400 font-bold">+</span> ${escapeHTML(a)}</li>`).join('')}
                   </ul>
                 </div>
               ` : ''}
 
               ${patch.changed && patch.changed.length > 0 ? `
-                <div>
-                  <h4 class="text-xs font-black uppercase tracking-wider text-brand-400 mb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-pen-fancy"></i> Cambios & Rebalanceos
+                <div class="pt-2">
+                  <h4 class="text-xs font-black text-brand-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Cambios y Ajustes
                   </h4>
                   <ul class="space-y-1.5 pl-2">
-                    ${patch.changed.map(item => `
-                      <li class="text-xs sm:text-sm text-slate-300 flex items-start gap-2">
-                        <span class="text-brand-400 font-bold">•</span> <span>${escapeHTML(item)}</span>
-                      </li>
-                    `).join('')}
+                    ${patch.changed.map(c => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-brand-400 font-bold">*</span> ${escapeHTML(c)}</li>`).join('')}
                   </ul>
                 </div>
               ` : ''}
 
               ${patch.fixed && patch.fixed.length > 0 ? `
-                <div>
-                  <h4 class="text-xs font-black uppercase tracking-wider text-red-400 mb-2 flex items-center gap-1.5">
+                <div class="pt-2">
+                  <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                     <i class="fa-solid fa-bug-slash"></i> Corrección de Errores
                   </h4>
                   <ul class="space-y-1.5 pl-2">
-                    ${patch.fixed.map(item => `
-                      <li class="text-xs sm:text-sm text-slate-300 flex items-start gap-2">
-                        <span class="text-red-400 font-bold">•</span> <span>${escapeHTML(item)}</span>
-                      </li>
-                    `).join('')}
+                    ${patch.fixed.map(f => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-amber-400 font-bold">-</span> ${escapeHTML(f)}</li>`).join('')}
                   </ul>
                 </div>
               ` : ''}
@@ -1825,8 +1807,7 @@
 
     function setPatchCategoryFilter(cat) {
       currentPatchCategory = cat;
-      const tabs = document.querySelectorAll('.patch-tab');
-      tabs.forEach(tab => {
+      document.querySelectorAll('.patch-tab').forEach(tab => {
         tab.classList.remove('active', 'border-emerald-500', 'bg-emerald-500', 'text-white', 'shadow-lg');
         tab.classList.add('border-slate-800', 'glass-card', 'text-slate-400');
       });
@@ -1834,110 +1815,19 @@
       renderPatches();
     }
 
-    function openPatchModal(isEdit = false) {
-      if (!isAdminLoggedIn) return;
-      const modal = document.getElementById('patchFormModal');
-      modal.classList.remove('hidden');
-      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-
-      if (!isEdit) {
-        document.getElementById('patchModalTitle').textContent = "Publicar Notas de Parche";
-        document.getElementById('patchEditId').value = "";
-        document.getElementById('patchVersionInput').value = "";
-        document.getElementById('patchDateInput').value = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-        document.getElementById('patchTitleInput').value = "";
-        document.getElementById('patchCategoryInput').value = "Major Update";
-        document.getElementById('patchAddedInput').value = "";
-        document.getElementById('patchChangedInput').value = "";
-        document.getElementById('patchFixedInput').value = "";
-      }
-    }
-
-    function closePatchModal() {
-      const modal = document.getElementById('patchFormModal');
-      modal.classList.add('opacity-0', 'scale-95');
-      setTimeout(() => modal.classList.add('hidden'), 300);
-    }
-
-    function savePatch(e) {
-      e.preventDefault();
-      if (!isAdminLoggedIn) return;
-
-      const editId = document.getElementById('patchEditId').value;
-      const version = document.getElementById('patchVersionInput').value.trim();
-      const date = document.getElementById('patchDateInput').value.trim();
-      const title = document.getElementById('patchTitleInput').value.trim();
-      const category = document.getElementById('patchCategoryInput').value;
-
-      const added = document.getElementById('patchAddedInput').value.split('\n').filter(line => line.trim() !== '');
-      const changed = document.getElementById('patchChangedInput').value.split('\n').filter(line => line.trim() !== '');
-      const fixed = document.getElementById('patchFixedInput').value.split('\n').filter(line => line.trim() !== '');
-
-      if (editId) {
-        const index = patchesData.findIndex(p => p.id === editId);
-        if (index !== -1) {
-          patchesData[index] = { id: editId, version, date, title, category, added, changed, fixed };
-          showToast("Parche actualizado correctamente", "success");
+    function toggleAdminModal() {
+      if (isAdminLoggedIn) {
+        if (confirm("¿Cerrar sesión del Modo Staff?")) {
+          isAdminLoggedIn = false;
+          updateAdminUI();
+          showToast("Sesión de Staff cerrada", "info");
         }
       } else {
-        const newPatch = { id: 'patch-' + Date.now(), version, date, title, category, added, changed, fixed };
-        patchesData.unshift(newPatch);
-        showToast("Nuevo parche publicado con éxito", "success");
-      }
-
-      saveData();
-      renderPatches();
-      closePatchModal();
-    }
-
-    function editPatch(id) {
-      const patch = patchesData.find(p => p.id === id);
-      if (!patch) return;
-
-      document.getElementById('patchModalTitle').textContent = "Editar Parche (" + patch.version + ")";
-      document.getElementById('patchEditId').value = patch.id;
-      document.getElementById('patchVersionInput').value = patch.version;
-      document.getElementById('patchDateInput').value = patch.date;
-      document.getElementById('patchTitleInput').value = patch.title;
-      document.getElementById('patchCategoryInput').value = patch.category;
-
-      document.getElementById('patchAddedInput').value = (patch.added || []).join('\n');
-      document.getElementById('patchChangedInput').value = (patch.changed || []).join('\n');
-      document.getElementById('patchFixedInput').value = (patch.fixed || []).join('\n');
-
-      openPatchModal(true);
-    }
-
-    function deletePatch(id) {
-      if (!isAdminLoggedIn) return;
-      if (confirm("¿Eliminar estas notas de parche?")) {
-        patchesData = patchesData.filter(p => p.id !== id);
-        saveData();
-        renderPatches();
-        showToast("Notas de parche eliminadas", "info");
-      }
-    }
-
-    function confirmResetPatches() {
-      if (!isAdminLoggedIn) return;
-      if (confirm("¿Restablecer notas de parche por defecto?")) {
-        patchesData = [...DEFAULT_PATCHES];
-        saveData();
-        renderPatches();
-        showToast("Notas de parche restablecidas", "info");
-      }
-    }
-
-    function toggleAdminModal() {
-      const modal = document.getElementById('adminPasswordModal');
-      if (isAdminLoggedIn) {
-        isAdminLoggedIn = false;
-        showWhitelistFormView();
-        updateAdminUI();
-        showToast("Sesión de Staff cerrada", "info");
-      } else {
+        const modal = document.getElementById('adminPasswordModal');
         modal.classList.remove('hidden');
         setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+        document.getElementById('adminPasswordInput').value = "";
+        document.getElementById('adminLoginError').classList.add('hidden');
       }
     }
 
@@ -1950,55 +1840,51 @@
     function handleAdminLogin(e) {
       e.preventDefault();
       const pwd = document.getElementById('adminPasswordInput').value;
-      const err = document.getElementById('adminLoginError');
-      const modal = document.getElementById('adminPasswordModal');
-
       if (pwd === 'admin123') {
         isAdminLoggedIn = true;
-        err.classList.add('hidden');
-        modal.classList.add('opacity-0', 'scale-95');
-        setTimeout(() => modal.classList.add('hidden'), 300);
-        document.getElementById('adminPasswordInput').value = '';
+        closeAdminModal();
         updateAdminUI();
-        showToast("Modo Staff Activado", "success");
+        showToast("¡Modo Staff activado con éxito!", "success");
       } else {
-        err.classList.remove('hidden');
+        document.getElementById('adminLoginError').classList.remove('hidden');
       }
     }
 
     function updateAdminUI() {
-      const adminBtnText = document.getElementById('adminBtnText');
-      const adminIcon = document.getElementById('adminIcon');
-      const addBtn = document.getElementById('addRuleBtn');
-      const resetBtn = document.getElementById('resetRulesBtn');
+      const btnText = document.getElementById('adminBtnText');
+      const icon = document.getElementById('adminIcon');
+      const toggleBtn = document.getElementById('adminToggleBtn');
+      
+      const addRuleBtn = document.getElementById('addRuleBtn');
+      const resetRulesBtn = document.getElementById('resetRulesBtn');
       const addPatchBtn = document.getElementById('addPatchBtn');
       const resetPatchesBtn = document.getElementById('resetPatchesBtn');
-      const staffWhitelistToolbar = document.getElementById('staffWhitelistToolbar');
       const addFeatureImageBtn = document.getElementById('addFeatureImageBtn');
+      const staffWlToolbar = document.getElementById('staffWhitelistToolbar');
 
       if (isAdminLoggedIn) {
-        adminBtnText.textContent = "Salir de Staff";
-        adminIcon.className = "fa-solid fa-right-from-bracket text-red-400";
-        addBtn.classList.remove('hidden'); addBtn.classList.add('flex');
-        resetBtn.classList.remove('hidden'); resetBtn.classList.add('flex');
-        addPatchBtn.classList.remove('hidden'); addPatchBtn.classList.add('flex');
-        resetPatchesBtn.classList.remove('hidden'); resetPatchesBtn.classList.add('flex');
-        staffWhitelistToolbar.classList.remove('hidden');
-        staffWhitelistToolbar.classList.add('flex');
-        addFeatureImageBtn.classList.remove('hidden');
-        addFeatureImageBtn.classList.add('flex');
+        btnText.textContent = "Staff Activo";
+        icon.className = "fa-solid fa-shield-check text-emerald-400 text-sm";
+        toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:scale-105 active:scale-95";
+
+        if(addRuleBtn) addRuleBtn.classList.remove('hidden');
+        if(resetRulesBtn) resetRulesBtn.classList.remove('hidden');
+        if(addPatchBtn) addPatchBtn.classList.remove('hidden');
+        if(resetPatchesBtn) resetPatchesBtn.classList.remove('hidden');
+        if(addFeatureImageBtn) addFeatureImageBtn.classList.remove('hidden');
+        if(staffWlToolbar) staffWlToolbar.classList.remove('hidden');
       } else {
-        adminBtnText.textContent = "Modo Staff";
-        adminIcon.className = "fa-solid fa-user-shield text-brand-500";
-        addBtn.classList.add('hidden'); addBtn.classList.remove('flex');
-        resetBtn.classList.add('hidden'); resetBtn.classList.remove('flex');
-        addPatchBtn.classList.add('hidden'); addPatchBtn.classList.remove('flex');
-        resetPatchesBtn.classList.add('hidden'); resetPatchesBtn.classList.remove('flex');
-        staffWhitelistToolbar.classList.add('hidden');
-        staffWhitelistToolbar.classList.remove('flex');
-        addFeatureImageBtn.classList.add('hidden');
-        addFeatureImageBtn.classList.remove('flex');
-        
+        btnText.textContent = "Modo Staff";
+        icon.className = "fa-solid fa-user-shield text-brand-500 text-sm";
+        toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-slate-700 bg-slate-900/80 text-slate-300 hover:border-brand-500 hover:text-white hover:scale-105 active:scale-95";
+
+        if(addRuleBtn) addRuleBtn.classList.add('hidden');
+        if(resetRulesBtn) resetRulesBtn.classList.add('hidden');
+        if(addPatchBtn) addPatchBtn.classList.add('hidden');
+        if(resetPatchesBtn) resetPatchesBtn.classList.add('hidden');
+        if(addFeatureImageBtn) addFeatureImageBtn.classList.add('hidden');
+        if(staffWlToolbar) staffWlToolbar.classList.add('hidden');
+
         showWhitelistFormView();
       }
 
@@ -2008,22 +1894,36 @@
       renderWhitelistFormBuilder();
     }
 
-    function openRuleModal(isEdit = false) {
+    function openRuleModal() {
       if (!isAdminLoggedIn) return;
       const modal = document.getElementById('ruleFormModal');
       modal.classList.remove('hidden');
       setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('modalFormTitle').textContent = "Agregar Nueva Normativa";
+      document.getElementById('ruleEditId').value = "";
+      document.getElementById('ruleCodeInput').value = "";
+      document.getElementById('ruleTitleInput').value = "";
+      document.getElementById('ruleSummaryInput').value = "";
+      document.getElementById('ruleDescriptionInput').value = "";
+    }
 
-      if (!isEdit) {
-        document.getElementById('modalFormTitle').textContent = "Agregar Nueva Normativa";
-        document.getElementById('ruleEditId').value = "";
-        document.getElementById('ruleCodeInput').value = "";
-        document.getElementById('ruleTitleInput').value = "";
-        document.getElementById('ruleSummaryInput').value = "";
-        document.getElementById('ruleDescriptionInput').value = "";
-        document.getElementById('ruleCategoryInput').value = "GENERAL";
-        document.getElementById('rulePenaltyInput').value = "Advertencia";
-      }
+    function editRule(id) {
+      if (!isAdminLoggedIn) return;
+      const rule = rulesData.find(r => r.id === id);
+      if (!rule) return;
+
+      const modal = document.getElementById('ruleFormModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+
+      document.getElementById('modalFormTitle').textContent = "Editar Normativa";
+      document.getElementById('ruleEditId').value = rule.id;
+      document.getElementById('ruleCodeInput').value = rule.code;
+      document.getElementById('ruleCategoryInput').value = rule.category;
+      document.getElementById('ruleTitleInput').value = rule.title;
+      document.getElementById('rulePenaltyInput').value = rule.penalty;
+      document.getElementById('ruleSummaryInput').value = rule.summary;
+      document.getElementById('ruleDescriptionInput').value = rule.description;
     }
 
     function closeRuleModal() {
@@ -2037,21 +1937,22 @@
       if (!isAdminLoggedIn) return;
 
       const editId = document.getElementById('ruleEditId').value;
-      const code = document.getElementById('ruleCodeInput').value.trim();
-      const title = document.getElementById('ruleTitleInput').value.trim();
-      const summary = document.getElementById('ruleSummaryInput').value.trim();
-      const description = document.getElementById('ruleDescriptionInput').value.trim();
-      const category = document.getElementById('ruleCategoryInput').value;
-      const penalty = document.getElementById('rulePenaltyInput').value;
+      const ruleObj = {
+        id: editId || ('rule-' + Date.now()),
+        code: document.getElementById('ruleCodeInput').value.trim(),
+        category: document.getElementById('ruleCategoryInput').value,
+        title: document.getElementById('ruleTitleInput').value.trim(),
+        penalty: document.getElementById('rulePenaltyInput').value,
+        summary: document.getElementById('ruleSummaryInput').value.trim(),
+        description: document.getElementById('ruleDescriptionInput').value.trim()
+      };
 
       if (editId) {
         const index = rulesData.findIndex(r => r.id === editId);
-        if (index !== -1) {
-          rulesData[index] = { id: editId, code, title, summary, description, category, penalty };
-          showToast("Normativa actualizada", "success");
-        }
+        if (index !== -1) rulesData[index] = ruleObj;
+        showToast("Normativa actualizada correctamente", "success");
       } else {
-        rulesData.unshift({ id: 'rule-' + Date.now(), code, title, summary, description, category, penalty });
+        rulesData.unshift(ruleObj);
         showToast("Nueva normativa añadida", "success");
       }
 
@@ -2060,25 +1961,9 @@
       closeRuleModal();
     }
 
-    function editRule(id) {
-      const rule = rulesData.find(r => r.id === id);
-      if (!rule) return;
-
-      document.getElementById('modalFormTitle').textContent = "Editar Normativa (" + rule.code + ")";
-      document.getElementById('ruleEditId').value = rule.id;
-      document.getElementById('ruleCodeInput').value = rule.code;
-      document.getElementById('ruleTitleInput').value = rule.title;
-      document.getElementById('ruleSummaryInput').value = rule.summary;
-      document.getElementById('ruleDescriptionInput').value = rule.description;
-      document.getElementById('ruleCategoryInput').value = rule.category;
-      document.getElementById('rulePenaltyInput').value = rule.penalty;
-
-      openRuleModal(true);
-    }
-
     function deleteRule(id) {
       if (!isAdminLoggedIn) return;
-      if (confirm("¿Eliminar esta normativa?")) {
+      if (confirm("¿Estás seguro de eliminar esta normativa?")) {
         rulesData = rulesData.filter(r => r.id !== id);
         saveData();
         renderRules();
@@ -2088,7 +1973,7 @@
 
     function confirmResetRules() {
       if (!isAdminLoggedIn) return;
-      if (confirm("¿Restablecer normativas por defecto?")) {
+      if (confirm("¿Deseas restablecer las normativas a sus valores predeterminados?")) {
         rulesData = [...DEFAULT_RULES];
         saveData();
         renderRules();
@@ -2096,31 +1981,132 @@
       }
     }
 
-    function escapeHTML(str) {
-      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    function openPatchModal() {
+      if (!isAdminLoggedIn) return;
+      const modal = document.getElementById('patchFormModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('patchModalTitle').textContent = "Publicar Notas de Parche";
+      document.getElementById('patchEditId').value = "";
+      document.getElementById('patchVersionInput').value = "";
+      document.getElementById('patchDateInput').value = "";
+      document.getElementById('patchTitleInput').value = "";
+      document.getElementById('patchAddedInput').value = "";
+      document.getElementById('patchChangedInput').value = "";
+      document.getElementById('patchFixedInput').value = "";
     }
 
-    function showToast(message, type = 'info') {
+    function editPatch(id) {
+      if (!isAdminLoggedIn) return;
+      const patch = patchesData.find(p => p.id === id);
+      if (!patch) return;
+
+      const modal = document.getElementById('patchFormModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+
+      document.getElementById('patchModalTitle').textContent = "Editar Notas de Parche";
+      document.getElementById('patchEditId').value = patch.id;
+      document.getElementById('patchVersionInput').value = patch.version;
+      document.getElementById('patchDateInput').value = patch.date;
+      document.getElementById('patchCategoryInput').value = patch.category;
+      document.getElementById('patchTitleInput').value = patch.title;
+      document.getElementById('patchAddedInput').value = (patch.added || []).join('\n');
+      document.getElementById('patchChangedInput').value = (patch.changed || []).join('\n');
+      document.getElementById('patchFixedInput').value = (patch.fixed || []).join('\n');
+    }
+
+    function closePatchModal() {
+      const modal = document.getElementById('patchFormModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function savePatch(e) {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const editId = document.getElementById('patchEditId').value;
+      const addedLines = document.getElementById('patchAddedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const changedLines = document.getElementById('patchChangedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const fixedLines = document.getElementById('patchFixedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+      const patchObj = {
+        id: editId || ('patch-' + Date.now()),
+        version: document.getElementById('patchVersionInput').value.trim(),
+        date: document.getElementById('patchDateInput').value.trim(),
+        category: document.getElementById('patchCategoryInput').value,
+        title: document.getElementById('patchTitleInput').value.trim(),
+        added: addedLines,
+        changed: changedLines,
+        fixed: fixedLines
+      };
+
+      if (editId) {
+        const index = patchesData.findIndex(p => p.id === editId);
+        if (index !== -1) patchesData[index] = patchObj;
+        showToast("Notas de parche actualizadas", "success");
+      } else {
+        patchesData.unshift(patchObj);
+        showToast("Notas de parche publicadas", "success");
+      }
+
+      saveData();
+      renderPatches();
+      closePatchModal();
+    }
+
+    function deletePatch(id) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Estás seguro de eliminar estas notas de parche?")) {
+        patchesData = patchesData.filter(p => p.id !== id);
+        saveData();
+        renderPatches();
+        showToast("Parche eliminado", "info");
+      }
+    }
+
+    function confirmResetPatches() {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Restablecer las notas de parche por defecto?")) {
+        patchesData = [...DEFAULT_PATCHES];
+        saveData();
+        renderPatches();
+        showToast("Parches restablecidos", "info");
+      }
+    }
+
+    function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
       
-      let bg = 'bg-slate-900 border-brand-500 text-white';
-      let icon = 'fa-circle-info text-brand-500';
-
-      if (type === 'success') {
-        bg = 'bg-slate-900 border-emerald-500 text-white';
-        icon = 'fa-circle-check text-emerald-500';
+      let bg = "bg-emerald-600/90 border-emerald-500 text-white";
+      let icon = "fa-circle-check";
+      if (type === 'info') {
+        bg = "bg-brand-600/90 border-brand-500 text-white";
+        icon = "fa-circle-info";
+      } else if (type === 'error') {
+        bg = "bg-red-600/90 border-red-500 text-white";
+        icon = "fa-triangle-exclamation";
       }
 
-      toast.className = `pointer-events-auto flex items-center gap-3 px-5 py-3.5 rounded-xl border ${bg} shadow-2xl text-xs font-black transition-all duration-300 transform translate-y-4 opacity-0`;
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl flex items-center gap-3 text-xs font-extrabold backdrop-blur-md transition-all duration-300 translate-y-4 opacity-0 ${bg}`;
       toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i> <span>${escapeHTML(message)}</span>`;
-
+      
       container.appendChild(toast);
       setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
+
       setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-4');
+        toast.classList.add('translate-y-4', 'opacity-0');
         setTimeout(() => toast.remove(), 300);
       }, 3500);
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
     }
   </script>
 </body>
