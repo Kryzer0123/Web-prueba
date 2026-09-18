@@ -15,6 +15,107 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- MODAL DE ACCESO MODO STAFF CON FIREBASE -->
+<div id="adminPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 transition-all duration-300 opacity-0 scale-95">
+  <div class="glass-card rounded-2xl border border-brand-500/40 max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+    <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div class="text-center mb-6">
+      <div class="w-14 h-14 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-500 flex items-center justify-center mx-auto text-2xl mb-4 animate-bounce">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <h3 class="text-2xl font-black text-white">Acceso Modo Staff</h3>
+      <p class="text-slate-400 text-xs mt-1">Ingresa tus credenciales de administrador de Firebase</p>
+    </div>
+
+    <form onsubmit="handleFirebaseAdminLogin(event)" class="space-y-4">
+      <div>
+        <label class="block text-xs font-black text-slate-300 uppercase mb-2">Correo Electrónico Staff</label>
+        <input type="email" id="adminEmailInput" required placeholder="staff@caracasvibes2.com" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-black text-slate-300 uppercase mb-2">Contraseña</label>
+        <input type="password" id="adminPasswordInput" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
+      </div>
+      <div id="adminLoginError" class="text-red-400 text-xs hidden font-bold flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation"></i> <span id="errorText">Credenciales inválidas o sin permisos.</span>
+      </div>
+      <button type="submit" class="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm transition-all shadow-lg shadow-brand-500/30 hover:scale-[1.02] active:scale-95">
+        Iniciar Sesión con Firebase
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- SCRIPTS DE FIREBASE Y LÓGICA DE AUTENTICACIÓN -->
+<script type="module">
+  // Importar los SDKs necesarios de Firebase desde los CDN oficiales
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Configuración de tu proyecto Firebase (Sustituye con tus credenciales reales)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAijXCsoF0S5BxE8x6UBoHmrHfJBqiEuKI
+    authDomain: "web-prueba-bd043.firebaseapp.com",
+    projectId: "web-prueba-bd043",
+    storageBucket: "web-prueba-bd043.firebasestorage.app",
+    messagingSenderId: "165726822435",
+    appId: "1:165726822435:web:d0398c4b2229fe49111196",
+    measurementId: "G-30FQDYJ12Z"
+  };
+
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Exponer funciones al ámbito global para conectarlas con los botones existentes
+  window.handleFirebaseAdminLogin = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('adminEmailInput').value;
+    const password = document.getElementById('adminPasswordInput').value;
+    const errorEl = document.getElementById('adminLoginError');
+    const errorText = document.getElementById('errorText');
+
+    try {
+      // 1. Autenticar 
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 2. Verificar si el usuario pertenece al rol de Staff/Admin
+      const userDocRef = doc(db, "staff_users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists() && userDoc.data().role === "admin") {
+        window.isAdminLoggedIn = true;
+        window.closeAdminModal();
+        window.updateAdminUI();
+        window.showToast("¡Sesión de Staff iniciada vía Firebase!", "success");
+      } else {
+        await signOut(auth);
+        errorText.textContent = "No tienes permisos de administrador en la base de datos.";
+        errorEl.classList.remove('hidden');
+      }
+    } catch (error) {
+      errorText.textContent = "Error: " + error.message;
+      errorEl.classList.remove('hidden');
+    }
+  };
+
+  // Mantener la sesión 
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const userDoc = await getDoc(doc(db, "staff_users", user.uid));
+      if (userDoc.exists() && userDoc.data().role === "admin") {
+        window.isAdminLoggedIn = true;
+        window.updateAdminUI();
+      }
+    }
+  });
+</script>
 
   <script>
     tailwind.config = {
@@ -408,7 +509,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Tu Nombre / Tag de Discord</label>
-              <input type="text" id="wlDiscord" required placeholder="Ej. usuario#1234 o username" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-sky-500 text-sm" />
+              <input type="text" id="wlDiscord" required placeholder="Ej. usuario#1234 or username" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-sky-500 text-sm" />
             </div>
             <div>
               <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Edad Real</label>
@@ -578,7 +679,7 @@
           <i class="fa-solid fa-lock"></i>
         </div>
         <h3 class="text-2xl font-black text-white">Acceso Modo Staff</h3>
-        <p class="text-slate-400 text-xs mt-1">Ingresa la clave administrativa (Clave Demo: <span class="text-brand-500 font-bold">admin123</span>)</p>
+        <p class="text-slate-400 text-xs mt-1">Ingresa la clave administrativa </p>
       </div>
 
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
@@ -917,7 +1018,7 @@
     ];
 
     const DEFAULT_CATEGORIES = [
-      { id: 'cat-conceptos', name: '3. Conocimientos Basicos De Rol' },
+      { id: 'cat-conceptos', name: '3. Conocimientos Básicos de Rol' },
       { id: 'cat-casos', name: '4. Resolución de Casos Prácticos' }
     ];
 
@@ -1219,399 +1320,6 @@
       }
     }
 
-    function renderWhitelistFormBuilder() {
-      const container = document.getElementById('dynamicCategoriesContainer');
-      if (!container) return;
-
-      container.innerHTML = '';
-
-      whitelistCategories.forEach((cat, catIdx) => {
-        const catSection = document.createElement('div');
-        catSection.className = "border-t border-slate-800/80 pt-6 space-y-4";
-
-        let catHeaderControls = '';
-        if (isAdminLoggedIn) {
-          catHeaderControls = `
-            <div class="flex items-center gap-2">
-              <button type="button" onclick="openEditCategoryModal('${cat.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all" title="Editar Categoría">
-                <i class="fa-solid fa-pen"></i> Editar
-              </button>
-              <button type="button" onclick="deleteCategory('${cat.id}')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all" title="Eliminar Categoría">
-                <i class="fa-solid fa-trash"></i> Borrar
-              </button>
-            </div>
-          `;
-        }
-
-        catSection.innerHTML = `
-          <div class="flex items-center justify-between gap-4">
-            <h3 class="text-lg font-black text-sky-400 flex items-center gap-2">
-              <span class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-xs">${catIdx + 3}</span> ${escapeHTML(cat.name)}
-            </h3>
-            ${catHeaderControls}
-          </div>
-          <div id="questions-cat-${cat.id}" class="space-y-4"></div>
-        `;
-        container.appendChild(catSection);
-
-        const qContainer = catSection.querySelector(`#questions-cat-${cat.id}`);
-        const catQuestions = whitelistQuestions.filter(q => q.categoryId === cat.id);
-
-        catQuestions.forEach((q, qIdx) => {
-          const qDiv = document.createElement('div');
-          qDiv.className = "space-y-1 bg-slate-950/30 p-4 rounded-xl border border-slate-800/60";
-
-          let qControls = '';
-          if (isAdminLoggedIn) {
-            qControls = `
-              <div class="flex items-center gap-2">
-                <button type="button" onclick="openEditQuestionModal('${q.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all" title="Editar Pregunta">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-                <button type="button" onclick="deleteQuestion('${q.id}')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all" title="Eliminar Pregunta">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </div>
-            `;
-          }
-
-          const fieldHTML = q.type === 'input' 
-            ? `<input type="text" id="wlQ_${q.id}" required placeholder="${escapeHTML(q.placeholder)}" class="w-full px-4 py-3 rounded-xl glass-card text-white text-sm focus:outline-none focus:border-sky-500" />`
-            : `<textarea id="wlQ_${q.id}" rows="2" required placeholder="${escapeHTML(q.placeholder)}" class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-sky-500"></textarea>`;
-
-          qDiv.innerHTML = `
-            <div class="flex items-center justify-between gap-2">
-              <label class="block text-xs font-bold text-slate-300">${qIdx + 1}. ${escapeHTML(q.text)}</label>
-              ${qControls}
-            </div>
-            ${fieldHTML}
-          `;
-          qContainer.appendChild(qDiv);
-        });
-      });
-    }
-
-    function openAddCategoryModal() {
-      if (!isAdminLoggedIn) return;
-      const modal = document.getElementById('categoryModal');
-      modal.classList.remove('hidden');
-      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-      document.getElementById('categoryModalTitle').textContent = "Nueva Categoría";
-      document.getElementById('categoryEditId').value = "";
-      document.getElementById('categoryNameInput').value = "";
-    }
-
-    function openEditCategoryModal(catId) {
-      if (!isAdminLoggedIn) return;
-      const cat = whitelistCategories.find(c => c.id === catId);
-      if (!cat) return;
-
-      const modal = document.getElementById('categoryModal');
-      modal.classList.remove('hidden');
-      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-      document.getElementById('categoryModalTitle').textContent = "Editar Categoría";
-      document.getElementById('categoryEditId').value = cat.id;
-      document.getElementById('categoryNameInput').value = cat.name;
-    }
-
-    function closeCategoryModal() {
-      const modal = document.getElementById('categoryModal');
-      modal.classList.add('opacity-0', 'scale-95');
-      setTimeout(() => modal.classList.add('hidden'), 300);
-    }
-
-    function saveCategory(e) {
-      e.preventDefault();
-      if (!isAdminLoggedIn) return;
-
-      const editId = document.getElementById('categoryEditId').value;
-      const name = document.getElementById('categoryNameInput').value.trim();
-
-      if (editId) {
-        const cat = whitelistCategories.find(c => c.id === editId);
-        if (cat) {
-          cat.name = name;
-          showToast("Categoría actualizada con éxito", "success");
-        }
-      } else {
-        const newCat = {
-          id: 'cat-' + Date.now(),
-          name
-        };
-        whitelistCategories.push(newCat);
-        showToast("Categoría creada con éxito", "success");
-      }
-
-      saveData();
-      renderWhitelistFormBuilder();
-      closeCategoryModal();
-    }
-
-    function deleteCategory(catId) {
-      if (!isAdminLoggedIn) return;
-      if (confirm("¿Estás seguro de eliminar esta categoría y todas las preguntas que contiene?")) {
-        whitelistCategories = whitelistCategories.filter(c => c.id !== catId);
-        whitelistQuestions = whitelistQuestions.filter(q => q.categoryId !== catId);
-        saveData();
-        renderWhitelistFormBuilder();
-        showToast("Categoría eliminada", "info");
-      }
-    }
-
-    function openAddQuestionModal() {
-      if (!isAdminLoggedIn) return;
-      if (whitelistCategories.length === 0) {
-        alert("Primero debes crear al menos una categoría.");
-        return;
-      }
-
-      const modal = document.getElementById('addQuestionModal');
-      modal.classList.remove('hidden');
-      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-      document.getElementById('questionModalTitle').textContent = "Añadir Pregunta a Whitelist";
-      document.getElementById('questionEditId').value = "";
-      document.getElementById('questionTextInput').value = "";
-      document.getElementById('questionPlaceholderInput').value = "";
-      document.getElementById('questionTypeSelect').value = "textarea";
-
-      populateCategorySelect();
-    }
-
-    function openEditQuestionModal(qId) {
-      if (!isAdminLoggedIn) return;
-      const q = whitelistQuestions.find(item => item.id === qId);
-      if (!q) return;
-
-      const modal = document.getElementById('addQuestionModal');
-      modal.classList.remove('hidden');
-      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-      document.getElementById('questionModalTitle').textContent = "Editar Pregunta";
-      document.getElementById('questionEditId').value = q.id;
-      document.getElementById('questionTextInput').value = q.text;
-      document.getElementById('questionPlaceholderInput').value = q.placeholder;
-      document.getElementById('questionTypeSelect').value = q.type || 'textarea';
-
-      populateCategorySelect(q.categoryId);
-    }
-
-    function populateCategorySelect(selectedId = '') {
-      const select = document.getElementById('questionCategorySelect');
-      select.innerHTML = '';
-      whitelistCategories.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat.id;
-        opt.textContent = cat.name;
-        if (cat.id === selectedId) opt.selected = true;
-        select.appendChild(opt);
-      });
-    }
-
-    function closeAddQuestionModal() {
-      const modal = document.getElementById('addQuestionModal');
-      modal.classList.add('opacity-0', 'scale-95');
-      setTimeout(() => modal.classList.add('hidden'), 300);
-    }
-
-    function saveQuestion(e) {
-      e.preventDefault();
-      if (!isAdminLoggedIn) return;
-
-      const editId = document.getElementById('questionEditId').value;
-      const categoryId = document.getElementById('questionCategorySelect').value;
-      const type = document.getElementById('questionTypeSelect').value;
-      const text = document.getElementById('questionTextInput').value.trim();
-      const placeholder = document.getElementById('questionPlaceholderInput').value.trim();
-
-      if (editId) {
-        const q = whitelistQuestions.find(item => item.id === editId);
-        if (q) {
-          q.categoryId = categoryId;
-          q.type = type;
-          q.text = text;
-          q.placeholder = placeholder;
-          showToast("Pregunta actualizada con éxito", "success");
-        }
-      } else {
-        const newQ = {
-          id: 'q-' + Date.now(),
-          categoryId,
-          type,
-          text,
-          placeholder
-        };
-        whitelistQuestions.push(newQ);
-        showToast("Pregunta añadida con éxito", "success");
-      }
-
-      saveData();
-      renderWhitelistFormBuilder();
-      closeAddQuestionModal();
-    }
-
-    function deleteQuestion(qId) {
-      if (!isAdminLoggedIn) return;
-      if (confirm("¿Estás seguro de eliminar esta pregunta del formulario?")) {
-        whitelistQuestions = whitelistQuestions.filter(q => q.id !== qId);
-        saveData();
-        renderWhitelistFormBuilder();
-        showToast("Pregunta eliminada", "info");
-      }
-    }
-
-    function handleWhitelistSubmit(e) {
-      e.preventDefault();
-
-      const customAnswers = {};
-      whitelistQuestions.forEach(q => {
-        const field = document.getElementById(`wlQ_${q.id}`);
-        if (field) {
-          customAnswers[q.text] = field.value.trim();
-        }
-      });
-
-      const appData = {
-        id: 'wl-' + Date.now(),
-        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-        discord: document.getElementById('wlDiscord').value.trim(),
-        age: document.getElementById('wlAge').value.trim(),
-        charName: document.getElementById('wlCharName').value.trim(),
-        charAge: document.getElementById('wlCharAge').value.trim(),
-        charBirth: document.getElementById('wlCharBirth').value.trim(),
-        charApp: document.getElementById('wlCharApp').value.trim(),
-        charLore: document.getElementById('wlCharLore').value.trim(),
-        customAnswers: customAnswers,
-        status: 'Pendiente'
-      };
-
-      whitelistAppsData.unshift(appData);
-      saveData();
-      updateWhitelistBadge();
-
-      showToast("¡Solicitud de Whitelist enviada con éxito!", "success");
-
-      const formEl = document.getElementById('whitelistForm');
-      if (formEl) {
-        formEl.reset();
-      }
-    }
-
-    function updateWhitelistBadge() {
-      const pending = whitelistAppsData.filter(a => a.status === 'Pendiente').length;
-      document.getElementById('pendingAppsCount').textContent = pending;
-    }
-
-    function showWhitelistManagerView() {
-      const formWrapper = document.getElementById('whitelistFormWrapper');
-      const adminPanel = document.getElementById('whitelistAdminPanel');
-      const btnReturnForm = document.getElementById('btnReturnForm');
-      const btnViewApps = document.getElementById('btnViewApps');
-
-      formWrapper.classList.add('hidden');
-      adminPanel.classList.remove('hidden');
-      
-      btnViewApps.classList.add('hidden');
-      btnReturnForm.classList.remove('hidden');
-
-      renderWhitelistApplications();
-    }
-
-    function showWhitelistFormView() {
-      const formWrapper = document.getElementById('whitelistFormWrapper');
-      const adminPanel = document.getElementById('whitelistAdminPanel');
-      const btnReturnForm = document.getElementById('btnReturnForm');
-      const btnViewApps = document.getElementById('btnViewApps');
-
-      formWrapper.classList.remove('hidden');
-      adminPanel.classList.add('hidden');
-
-      btnReturnForm.classList.add('hidden');
-      btnViewApps.classList.remove('hidden');
-    }
-
-    function renderWhitelistApplications() {
-      const container = document.getElementById('whitelistApplicationsContainer');
-      const emptyState = document.getElementById('emptyWhitelistState');
-      container.innerHTML = '';
-
-      if (whitelistAppsData.length === 0) {
-        emptyState.classList.remove('hidden');
-        return;
-      } else {
-        emptyState.classList.add('hidden');
-      }
-
-      whitelistAppsData.forEach(app => {
-        const card = document.createElement('div');
-        card.className = "glass-card rounded-2xl p-6 border border-slate-800 space-y-4";
-        
-        let statusBadge = '';
-        if (app.status === 'Pendiente') statusBadge = '<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold">Pendiente</span>';
-        else if (app.status === 'Aprobado') statusBadge = '<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold">Aprobado</span>';
-        else statusBadge = '<span class="px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold">Rechazado</span>';
-
-        let customHTML = '';
-        if (app.customAnswers && Object.keys(app.customAnswers).length > 0) {
-          customHTML += '<div class="border-t border-slate-800 pt-3 mt-3"><strong class="text-sky-400 text-xs">Test y Preguntas Dinámicas:</strong><ul class="mt-2 space-y-1 text-xs text-slate-300">';
-          for (const [qText, qAns] of Object.entries(app.customAnswers)) {
-            customHTML += `<li>• <strong>${escapeHTML(qText)}:</strong> ${escapeHTML(qAns)}</li>`;
-          }
-          customHTML += '</ul></div>';
-        }
-
-        card.innerHTML = `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-            <div class="flex items-center gap-3">
-              <span class="text-white font-black text-base">${escapeHTML(app.charName)}</span>
-              <span class="text-xs text-slate-400">Discord: <strong class="text-sky-400">${escapeHTML(app.discord)}</strong></span>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-xs text-slate-500">${app.date}</span>
-              ${statusBadge}
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-300">
-            <div><strong>Edad Real / IC:</strong> ${app.age} años / ${app.charAge} años</div>
-            <div><strong>Nacimiento:</strong> ${escapeHTML(app.charBirth)}</div>
-          </div>
-
-          <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-900 text-xs text-slate-300 space-y-2">
-            <div><strong class="text-sky-400">Lore del Personaje:</strong> ${escapeHTML(app.charLore)}</div>
-            <div><strong class="text-sky-400">Apariencia:</strong> ${escapeHTML(app.charApp)}</div>
-            ${customHTML}
-          </div>
-
-          <div class="flex items-center justify-end gap-3 pt-2">
-            <button onclick="setAppStatus('${app.id}', 'Aprobado')" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white font-bold text-xs transition-all">Aprobar</button>
-            <button onclick="setAppStatus('${app.id}', 'Rechazado')" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white font-bold text-xs transition-all">Rechazar</button>
-            <button onclick="deleteApp('${app.id}')" class="px-3 py-1.5 rounded-lg glass-card text-slate-400 hover:text-red-400 font-bold text-xs transition-all">Eliminar</button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function setAppStatus(id, status) {
-      const app = whitelistAppsData.find(a => a.id === id);
-      if (app) {
-        app.status = status;
-        saveData();
-        renderWhitelistApplications();
-        updateWhitelistBadge();
-        showToast("Estado de solicitud actualizado a: " + status, "success");
-      }
-    }
-
-    function deleteApp(id) {
-      if (confirm("¿Eliminar esta solicitud del registro?")) {
-        whitelistAppsData = whitelistAppsData.filter(a => a.id !== id);
-        saveData();
-        renderWhitelistApplications();
-        updateWhitelistBadge();
-        showToast("Solicitud eliminada", "info");
-      }
-    }
-
     function renderRules() {
       const container = document.getElementById('rulesContainer');
       const emptyState = document.getElementById('emptyRulesState');
@@ -1639,6 +1347,20 @@
         card.className = "glass-card rounded-2xl border border-brand-border p-5 hover:border-brand-500/50 transition-all duration-300 tilt-card";
         card.id = rule.id;
 
+        let adminActions = '';
+        if (isAdminLoggedIn) {
+          adminActions = `
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-800">
+              <button onclick="event.stopPropagation(); openEditRuleModal('${rule.id}')" class="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all">
+                <i class="fa-solid fa-pen"></i> Editar
+              </button>
+              <button onclick="event.stopPropagation(); deleteRule('${rule.id}')" class="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all">
+                <i class="fa-solid fa-trash"></i> Eliminar
+              </button>
+            </div>
+          `;
+        }
+
         card.innerHTML = `
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer select-none" onclick="toggleAccordion('${rule.id}')">
             <div class="flex items-start gap-4">
@@ -1648,36 +1370,19 @@
               <div>
                 <div class="flex items-center gap-2 flex-wrap">
                   <h3 class="text-lg font-extrabold text-white">${escapeHTML(rule.title)}</h3>
-                  <span class="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/40">
-                    ${escapeHTML(rule.penalty)}
-                  </span>
+                  <span class="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">${escapeHTML(rule.penalty)}</span>
                 </div>
                 <p class="text-slate-400 text-xs sm:text-sm mt-1">${escapeHTML(rule.summary)}</p>
               </div>
             </div>
-
-            <div class="flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-0 border-slate-800">
-              ${isAdminLoggedIn ? `
-                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
-                  <button onclick="editRule('${rule.id}')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all" title="Editar">
-                    <i class="fa-solid fa-pen"></i>
-                  </button>
-                  <button onclick="deleteRule('${rule.id}')" class="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all" title="Eliminar">
-                    <i class="fa-solid fa-trash"></i>
-                  </button>
-                </div>
-              ` : ''}
-              
-              <span class="text-slate-400 text-xs font-bold flex items-center gap-2">
-                <i class="fa-solid fa-chevron-down transition-transform duration-300 text-brand-500" id="icon-${rule.id}"></i>
-              </span>
+            <div class="flex items-center justify-between md:justify-end gap-3 text-brand-400 font-bold text-xs">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-chevron-down transition-transform duration-300" id="icon-${rule.id}"></i>
             </div>
           </div>
-
-          <div id="desc-${rule.id}" class="accordion-content">
-            <div class="pt-4 mt-4 border-t border-slate-800/80 text-slate-300 text-sm leading-relaxed space-y-3">
-              <p>${escapeHTML(rule.description)}</p>
-            </div>
+          <div id="content-${rule.id}" class="accordion-content">
+            <p class="text-slate-300 text-sm mt-3 pt-3 border-t border-slate-800 leading-relaxed">${escapeHTML(rule.description)}</p>
+            ${adminActions}
           </div>
         `;
         container.appendChild(card);
@@ -1685,213 +1390,34 @@
     }
 
     function toggleAccordion(id) {
-      const desc = document.getElementById(`desc-${id}`);
+      const content = document.getElementById(`content-${id}`);
       const icon = document.getElementById(`icon-${id}`);
-      if (desc && icon) {
-        if (desc.classList.contains('open')) {
-          desc.style.maxHeight = '0px';
-          desc.classList.remove('open');
-          icon.style.transform = 'rotate(0deg)';
-        } else {
-          desc.classList.add('open');
-          desc.style.maxHeight = desc.scrollHeight + 'px';
-          icon.style.transform = 'rotate(180deg)';
-        }
+      if (!content) return;
+
+      const isOpen = content.classList.contains('open');
+      document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
+      document.querySelectorAll('.fa-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
+
+      if (!isOpen) {
+        content.classList.add('open');
+        content.style.maxHeight = content.scrollHeight + 'px';
+        if (icon) icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.style.maxHeight = '0px';
       }
     }
 
     function setCategoryFilter(cat) {
       currentCategory = cat;
-      const tabs = document.querySelectorAll('.category-tab');
-      tabs.forEach(tab => {
-        tab.classList.remove('active', 'border-brand-500', 'bg-brand-500', 'text-white', 'shadow-lg');
-        tab.classList.add('border-slate-800', 'glass-card', 'text-slate-400');
+      document.querySelectorAll('.category-tab').forEach(btn => {
+        btn.className = "category-tab px-4 py-3 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-brand-500/50 hover:scale-105";
       });
-      event.currentTarget.classList.add('active', 'border-brand-500', 'bg-brand-500', 'text-white', 'shadow-lg');
+      event.currentTarget.className = "category-tab active px-4 py-3 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-brand-500 bg-brand-500 text-white shadow-lg shadow-brand-500/30 hover:scale-105";
       renderRules();
     }
 
-    function filterRules() { renderRules(); }
-
-    function renderPatches() {
-      const container = document.getElementById('patchesContainer');
-      const emptyState = document.getElementById('emptyPatchesState');
-      container.innerHTML = '';
-
-      const filtered = patchesData.filter(p => currentPatchCategory === 'ALL' || p.category === currentPatchCategory);
-
-      if (filtered.length === 0) {
-        emptyState.classList.remove('hidden');
-        return;
-      } else {
-        emptyState.classList.add('hidden');
-      }
-
-      filtered.forEach((patch) => {
-        const item = document.createElement('div');
-        item.className = "relative pl-8 sm:pl-16 group";
-
-        const categoryBadgeColor = patch.category === 'Major Update' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-brand-500/20 text-brand-400 border-brand-500/40';
-
-        item.innerHTML = `
-          <div class="absolute left-2.5 sm:left-6 top-6 -translate-x-1/2 w-4 h-4 rounded-full bg-slate-900 border-2 border-emerald-400 group-hover:scale-125 group-hover:bg-emerald-400 transition-all duration-300 shadow-md shadow-emerald-500/30"></div>
-
-          <div class="glass-card rounded-2xl border border-slate-800 p-6 sm:p-8 hover:border-emerald-500/50 transition-all duration-300 tilt-card">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-5">
-              <div>
-                <div class="flex items-center gap-3 flex-wrap">
-                  <span class="px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-black text-xs">
-                    ${escapeHTML(patch.version)}
-                  </span>
-                  <span class="text-xs uppercase font-black px-2.5 py-0.5 rounded-full border ${categoryBadgeColor}">
-                    ${escapeHTML(patch.category)}
-                  </span>
-                  <span class="text-xs text-slate-400 font-medium">
-                    <i class="fa-regular fa-calendar-check mr-1 text-slate-500"></i> ${escapeHTML(patch.date)}
-                  </span>
-                </div>
-                <h3 class="text-xl sm:text-2xl font-black text-white mt-2">${escapeHTML(patch.title)}</h3>
-              </div>
-
-              ${isAdminLoggedIn ? `
-                <div class="flex items-center gap-2">
-                  <button onclick="editPatch('${patch.id}')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all">
-                    <i class="fa-solid fa-pen mr-1"></i> Editar
-                  </button>
-                  <button onclick="deletePatch('${patch.id}')" class="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all">
-                    <i class="fa-solid fa-trash mr-1"></i> Eliminar
-                  </button>
-                </div>
-              ` : ''}
-            </div>
-
-            <div class="space-y-4 text-sm text-slate-300">
-              ${patch.added && patch.added.length > 0 ? `
-                <div>
-                  <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-plus-circle"></i> Nuevas Características
-                  </h4>
-                  <ul class="space-y-1.5 pl-2">
-                    ${patch.added.map(a => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-emerald-400 font-bold">+</span> ${escapeHTML(a)}</li>`).join('')}
-                  </ul>
-                </div>
-              ` : ''}
-
-              ${patch.changed && patch.changed.length > 0 ? `
-                <div class="pt-2">
-                  <h4 class="text-xs font-black text-brand-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders"></i> Cambios y Ajustes
-                  </h4>
-                  <ul class="space-y-1.5 pl-2">
-                    ${patch.changed.map(c => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-brand-400 font-bold">*</span> ${escapeHTML(c)}</li>`).join('')}
-                  </ul>
-                </div>
-              ` : ''}
-
-              ${patch.fixed && patch.fixed.length > 0 ? `
-                <div class="pt-2">
-                  <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-bug-slash"></i> Corrección de Errores
-                  </h4>
-                  <ul class="space-y-1.5 pl-2">
-                    ${patch.fixed.map(f => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-amber-400 font-bold">-</span> ${escapeHTML(f)}</li>`).join('')}
-                  </ul>
-                </div>
-              ` : ''}
-            </div>
-          </div>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    function setPatchCategoryFilter(cat) {
-      currentPatchCategory = cat;
-      document.querySelectorAll('.patch-tab').forEach(tab => {
-        tab.classList.remove('active', 'border-emerald-500', 'bg-emerald-500', 'text-white', 'shadow-lg');
-        tab.classList.add('border-slate-800', 'glass-card', 'text-slate-400');
-      });
-      event.currentTarget.classList.add('active', 'border-emerald-500', 'bg-emerald-500', 'text-white', 'shadow-lg');
-      renderPatches();
-    }
-
-    function toggleAdminModal() {
-      if (isAdminLoggedIn) {
-        if (confirm("¿Cerrar sesión del Modo Staff?")) {
-          isAdminLoggedIn = false;
-          updateAdminUI();
-          showToast("Sesión de Staff cerrada", "info");
-        }
-      } else {
-        const modal = document.getElementById('adminPasswordModal');
-        modal.classList.remove('hidden');
-        setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-        document.getElementById('adminPasswordInput').value = "";
-        document.getElementById('adminLoginError').classList.add('hidden');
-      }
-    }
-
-    function closeAdminModal() {
-      const modal = document.getElementById('adminPasswordModal');
-      modal.classList.add('opacity-0', 'scale-95');
-      setTimeout(() => modal.classList.add('hidden'), 300);
-    }
-
-    function handleAdminLogin(e) {
-      e.preventDefault();
-      const pwd = document.getElementById('adminPasswordInput').value;
-      if (pwd === 'admin123') {
-        isAdminLoggedIn = true;
-        closeAdminModal();
-        updateAdminUI();
-        showToast("¡Modo Staff activado con éxito!", "success");
-      } else {
-        document.getElementById('adminLoginError').classList.remove('hidden');
-      }
-    }
-
-    function updateAdminUI() {
-      const btnText = document.getElementById('adminBtnText');
-      const icon = document.getElementById('adminIcon');
-      const toggleBtn = document.getElementById('adminToggleBtn');
-      
-      const addRuleBtn = document.getElementById('addRuleBtn');
-      const resetRulesBtn = document.getElementById('resetRulesBtn');
-      const addPatchBtn = document.getElementById('addPatchBtn');
-      const resetPatchesBtn = document.getElementById('resetPatchesBtn');
-      const addFeatureImageBtn = document.getElementById('addFeatureImageBtn');
-      const staffWlToolbar = document.getElementById('staffWhitelistToolbar');
-
-      if (isAdminLoggedIn) {
-        btnText.textContent = "Staff Activo";
-        icon.className = "fa-solid fa-shield-check text-emerald-400 text-sm";
-        toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:scale-105 active:scale-95";
-
-        if(addRuleBtn) addRuleBtn.classList.remove('hidden');
-        if(resetRulesBtn) resetRulesBtn.classList.remove('hidden');
-        if(addPatchBtn) addPatchBtn.classList.remove('hidden');
-        if(resetPatchesBtn) resetPatchesBtn.classList.remove('hidden');
-        if(addFeatureImageBtn) addFeatureImageBtn.classList.remove('hidden');
-        if(staffWlToolbar) staffWlToolbar.classList.remove('hidden');
-      } else {
-        btnText.textContent = "Modo Staff";
-        icon.className = "fa-solid fa-user-shield text-brand-500 text-sm";
-        toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-slate-700 bg-slate-900/80 text-slate-300 hover:border-brand-500 hover:text-white hover:scale-105 active:scale-95";
-
-        if(addRuleBtn) addRuleBtn.classList.add('hidden');
-        if(resetRulesBtn) resetRulesBtn.classList.add('hidden');
-        if(addPatchBtn) addPatchBtn.classList.add('hidden');
-        if(resetPatchesBtn) resetPatchesBtn.classList.add('hidden');
-        if(addFeatureImageBtn) addFeatureImageBtn.classList.add('hidden');
-        if(staffWlToolbar) staffWlToolbar.classList.add('hidden');
-
-        showWhitelistFormView();
-      }
-
+    function filterRules() {
       renderRules();
-      renderPatches();
-      switchFeatureTab(currentFeatureTab);
-      renderWhitelistFormBuilder();
     }
 
     function openRuleModal() {
@@ -1907,15 +1433,14 @@
       document.getElementById('ruleDescriptionInput').value = "";
     }
 
-    function editRule(id) {
+    function openEditRuleModal(ruleId) {
       if (!isAdminLoggedIn) return;
-      const rule = rulesData.find(r => r.id === id);
+      const rule = rulesData.find(r => r.id === ruleId);
       if (!rule) return;
 
       const modal = document.getElementById('ruleFormModal');
       modal.classList.remove('hidden');
       setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-
       document.getElementById('modalFormTitle').textContent = "Editar Normativa";
       document.getElementById('ruleEditId').value = rule.id;
       document.getElementById('ruleCodeInput').value = rule.code;
@@ -1937,23 +1462,36 @@
       if (!isAdminLoggedIn) return;
 
       const editId = document.getElementById('ruleEditId').value;
-      const ruleObj = {
-        id: editId || ('rule-' + Date.now()),
-        code: document.getElementById('ruleCodeInput').value.trim(),
-        category: document.getElementById('ruleCategoryInput').value,
-        title: document.getElementById('ruleTitleInput').value.trim(),
-        penalty: document.getElementById('rulePenaltyInput').value,
-        summary: document.getElementById('ruleSummaryInput').value.trim(),
-        description: document.getElementById('ruleDescriptionInput').value.trim()
-      };
+      const code = document.getElementById('ruleCodeInput').value.trim();
+      const category = document.getElementById('ruleCategoryInput').value;
+      const title = document.getElementById('ruleTitleInput').value.trim();
+      const penalty = document.getElementById('rulePenaltyInput').value;
+      const summary = document.getElementById('ruleSummaryInput').value.trim();
+      const description = document.getElementById('ruleDescriptionInput').value.trim();
 
       if (editId) {
-        const index = rulesData.findIndex(r => r.id === editId);
-        if (index !== -1) rulesData[index] = ruleObj;
-        showToast("Normativa actualizada correctamente", "success");
+        const rule = rulesData.find(r => r.id === editId);
+        if (rule) {
+          rule.code = code;
+          rule.category = category;
+          rule.title = title;
+          rule.penalty = penalty;
+          rule.summary = summary;
+          rule.description = description;
+          showToast("Normativa actualizada con éxito", "success");
+        }
       } else {
-        rulesData.unshift(ruleObj);
-        showToast("Nueva normativa añadida", "success");
+        const newRule = {
+          id: 'rule-' + Date.now(),
+          code,
+          category,
+          title,
+          penalty,
+          summary,
+          description
+        };
+        rulesData.unshift(newRule);
+        showToast("Normativa creada con éxito", "success");
       }
 
       saveData();
@@ -1961,10 +1499,10 @@
       closeRuleModal();
     }
 
-    function deleteRule(id) {
+    function deleteRule(ruleId) {
       if (!isAdminLoggedIn) return;
-      if (confirm("¿Estás seguro de eliminar esta normativa?")) {
-        rulesData = rulesData.filter(r => r.id !== id);
+      if (confirm("¿Estás seguro de eliminar esta regla?")) {
+        rulesData = rulesData.filter(r => r.id !== ruleId);
         saveData();
         renderRules();
         showToast("Normativa eliminada", "info");
@@ -1972,13 +1510,92 @@
     }
 
     function confirmResetRules() {
-      if (!isAdminLoggedIn) return;
-      if (confirm("¿Deseas restablecer las normativas a sus valores predeterminados?")) {
+      if (confirm("¿Restablecer normativas predeterminadas? Se perderán los cambios personalizados.")) {
         rulesData = [...DEFAULT_RULES];
         saveData();
         renderRules();
         showToast("Normativas restablecidas", "info");
       }
+    }
+
+    function renderPatches() {
+      const container = document.getElementById('patchesContainer');
+      const emptyState = document.getElementById('emptyPatchesState');
+      container.innerHTML = '';
+
+      const filtered = patchesData.filter(patch => {
+        return currentPatchCategory === 'ALL' || patch.category === currentPatchCategory;
+      });
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      filtered.forEach((patch) => {
+        const item = document.createElement('div');
+        item.className = "relative pl-8 sm:pl-12 group";
+
+        let addedHTML = '';
+        if (patch.added && patch.added.length > 0 && patch.added[0] !== "") {
+          addedHTML = `<div class="space-y-1.5"><h5 class="text-xs font-black text-emerald-400 uppercase">Novedades [+]</h5><ul class="space-y-1 text-xs sm:text-sm text-slate-300">` +
+            patch.added.map(a => `<li>• ${escapeHTML(a)}</li>`).join('') + `</ul></div>`;
+        }
+
+        let changedHTML = '';
+        if (patch.changed && patch.changed.length > 0 && patch.changed[0] !== "") {
+          changedHTML = `<div class="space-y-1.5"><h5 class="text-xs font-black text-amber-400 uppercase">Cambios & Ajustes [*]</h5><ul class="space-y-1 text-xs sm:text-sm text-slate-300">` +
+            patch.changed.map(c => `<li>• ${escapeHTML(c)}</li>`).join('') + `</ul></div>`;
+        }
+
+        let fixedHTML = '';
+        if (patch.fixed && patch.fixed.length > 0 && patch.fixed[0] !== "") {
+          fixedHTML = `<div class="space-y-1.5"><h5 class="text-xs font-black text-sky-400 uppercase">Bugs Corregidos [-]</h5><ul class="space-y-1 text-xs sm:text-sm text-slate-300">` +
+            patch.fixed.map(f => `<li>• ${escapeHTML(f)}</li>`).join('') + `</ul></div>`;
+        }
+
+        let adminPatchActions = '';
+        if (isAdminLoggedIn) {
+          adminPatchActions = `
+            <div class="flex items-center gap-2 pt-3 border-t border-slate-800">
+              <button onclick="deletePatch('${patch.id}')" class="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all">
+                <i class="fa-solid fa-trash"></i> Eliminar Parche
+              </button>
+            </div>
+          `;
+        }
+
+        item.innerHTML = `
+          <div class="absolute left-2 sm:left-6 top-1.5 w-4 h-4 rounded-full bg-emerald-500 border-4 border-[#0b0e14] shadow-[0_0_10px_rgba(16,185,129,0.8)] z-10 group-hover:scale-125 transition-transform"></div>
+          <div class="glass-card rounded-2xl border border-slate-800 p-6 sm:p-8 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+              <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-xs border border-emerald-500/30">${escapeHTML(patch.version)}</span>
+                <h3 class="text-lg sm:text-xl font-black text-white">${escapeHTML(patch.title)}</h3>
+              </div>
+              <span class="text-xs text-slate-400 font-medium">${escapeHTML(patch.date)}</span>
+            </div>
+            <div class="space-y-4">
+              ${addedHTML}
+              ${changedHTML}
+              ${fixedHTML}
+            </div>
+            ${adminPatchActions}
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function setPatchCategoryFilter(cat) {
+      currentPatchCategory = cat;
+      document.querySelectorAll('.patch-tab').forEach(btn => {
+        btn.className = "patch-tab px-4 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-emerald-500/50 hover:scale-105";
+      });
+      event.currentTarget.className = "patch-tab active px-4 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:scale-105";
+      renderPatches();
     }
 
     function openPatchModal() {
@@ -1996,26 +1613,6 @@
       document.getElementById('patchFixedInput').value = "";
     }
 
-    function editPatch(id) {
-      if (!isAdminLoggedIn) return;
-      const patch = patchesData.find(p => p.id === id);
-      if (!patch) return;
-
-      const modal = document.getElementById('patchFormModal');
-      modal.classList.remove('hidden');
-      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-
-      document.getElementById('patchModalTitle').textContent = "Editar Notas de Parche";
-      document.getElementById('patchEditId').value = patch.id;
-      document.getElementById('patchVersionInput').value = patch.version;
-      document.getElementById('patchDateInput').value = patch.date;
-      document.getElementById('patchCategoryInput').value = patch.category;
-      document.getElementById('patchTitleInput').value = patch.title;
-      document.getElementById('patchAddedInput').value = (patch.added || []).join('\n');
-      document.getElementById('patchChangedInput').value = (patch.changed || []).join('\n');
-      document.getElementById('patchFixedInput').value = (patch.fixed || []).join('\n');
-    }
-
     function closePatchModal() {
       const modal = document.getElementById('patchFormModal');
       modal.classList.add('opacity-0', 'scale-95');
@@ -2026,39 +1623,35 @@
       e.preventDefault();
       if (!isAdminLoggedIn) return;
 
-      const editId = document.getElementById('patchEditId').value;
-      const addedLines = document.getElementById('patchAddedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      const changedLines = document.getElementById('patchChangedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      const fixedLines = document.getElementById('patchFixedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const version = document.getElementById('patchVersionInput').value.trim();
+      const date = document.getElementById('patchDateInput').value.trim();
+      const category = document.getElementById('patchCategoryInput').value;
+      const title = document.getElementById('patchTitleInput').value.trim();
+      const added = document.getElementById('patchAddedInput').value.split('\n').map(s => s.trim()).filter(Boolean);
+      const changed = document.getElementById('patchChangedInput').value.split('\n').map(s => s.trim()).filter(Boolean);
+      const fixed = document.getElementById('patchFixedInput').value.split('\n').map(s => s.trim()).filter(Boolean);
 
-      const patchObj = {
-        id: editId || ('patch-' + Date.now()),
-        version: document.getElementById('patchVersionInput').value.trim(),
-        date: document.getElementById('patchDateInput').value.trim(),
-        category: document.getElementById('patchCategoryInput').value,
-        title: document.getElementById('patchTitleInput').value.trim(),
-        added: addedLines,
-        changed: changedLines,
-        fixed: fixedLines
+      const newPatch = {
+        id: 'patch-' + Date.now(),
+        version,
+        date,
+        category,
+        title,
+        added,
+        changed,
+        fixed
       };
 
-      if (editId) {
-        const index = patchesData.findIndex(p => p.id === editId);
-        if (index !== -1) patchesData[index] = patchObj;
-        showToast("Notas de parche actualizadas", "success");
-      } else {
-        patchesData.unshift(patchObj);
-        showToast("Notas de parche publicadas", "success");
-      }
-
+      patchesData.unshift(newPatch);
       saveData();
       renderPatches();
       closePatchModal();
+      showToast("Notas de parche publicadas con éxito", "success");
     }
 
     function deletePatch(id) {
       if (!isAdminLoggedIn) return;
-      if (confirm("¿Estás seguro de eliminar estas notas de parche?")) {
+      if (confirm("¿Estás seguro de eliminar este parche?")) {
         patchesData = patchesData.filter(p => p.id !== id);
         saveData();
         renderPatches();
@@ -2067,8 +1660,7 @@
     }
 
     function confirmResetPatches() {
-      if (!isAdminLoggedIn) return;
-      if (confirm("¿Restablecer las notas de parche por defecto?")) {
+      if (confirm("¿Restablecer notas de parche predeterminadas?")) {
         patchesData = [...DEFAULT_PATCHES];
         saveData();
         renderPatches();
@@ -2076,37 +1668,117 @@
       }
     }
 
+    function toggleAdminModal() {
+      if (isAdminLoggedIn) {
+        if (confirm("¿Cerrar sesión de Modo Staff?")) {
+          isAdminLoggedIn = false;
+          updateAdminUI();
+          showToast("Sesión de Staff cerrada", "info");
+        }
+      } else {
+        const modal = document.getElementById('adminPasswordModal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+        document.getElementById('adminPasswordInput').value = "";
+        document.getElementById('adminLoginError').classList.add('hidden');
+      }
+    }
+
+    function closeAdminModal() {
+      const modal = document.getElementById('adminPasswordModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const pass = document.getElementById('adminPasswordInput').value;
+      if (pass === 'admin123') {
+        isAdminLoggedIn = true;
+        closeAdminModal();
+        updateAdminUI();
+        showToast("¡Modo Staff activado con éxito!", "success");
+      } else {
+        document.getElementById('adminLoginError').classList.remove('hidden');
+      }
+    }
+
+    function updateAdminUI() {
+      const adminBtnText = document.getElementById('adminBtnText');
+      const adminIcon = document.getElementById('adminIcon');
+      const adminToggleBtn = document.getElementById('adminToggleBtn');
+      const addRuleBtn = document.getElementById('addRuleBtn');
+      const resetRulesBtn = document.getElementById('resetRulesBtn');
+      const addPatchBtn = document.getElementById('addPatchBtn');
+      const resetPatchesBtn = document.getElementById('resetPatchesBtn');
+      const staffWhitelistToolbar = document.getElementById('staffWhitelistToolbar');
+      const addFeatureImageBtn = document.getElementById('addFeatureImageBtn');
+
+      if (isAdminLoggedIn) {
+        adminBtnText.textContent = "Staff Activo";
+        adminIcon.className = "fa-solid fa-user-shield text-emerald-400 text-sm";
+        adminToggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-emerald-500/60 bg-emerald-950/40 text-emerald-300 hover:scale-105 active:scale-95";
+        
+        if (addRuleBtn) addRuleBtn.classList.remove('hidden');
+        if (resetRulesBtn) resetRulesBtn.classList.remove('hidden');
+        if (addPatchBtn) addPatchBtn.classList.remove('hidden');
+        if (resetPatchesBtn) resetPatchesBtn.classList.remove('hidden');
+        if (staffWhitelistToolbar) staffWhitelistToolbar.classList.remove('hidden');
+        if (addFeatureImageBtn) addFeatureImageBtn.classList.remove('hidden');
+      } else {
+        adminBtnText.textContent = "Modo Staff";
+        adminIcon.className = "fa-solid fa-user-shield text-brand-500 text-sm";
+        adminToggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-slate-700 bg-slate-900/80 text-slate-300 hover:border-brand-500 hover:text-white hover:scale-105 active:scale-95";
+
+        if (addRuleBtn) addRuleBtn.classList.add('hidden');
+        if (resetRulesBtn) resetRulesBtn.classList.add('hidden');
+        if (addPatchBtn) addPatchBtn.classList.add('hidden');
+        if (resetPatchesBtn) resetPatchesBtn.classList.add('hidden');
+        if (staffWhitelistToolbar) staffWhitelistToolbar.classList.add('hidden');
+        if (addFeatureImageBtn) addFeatureImageBtn.classList.add('hidden');
+        showWhitelistFormView();
+      }
+
+      renderRules();
+      renderPatches();
+      renderWhitelistFormBuilder();
+      switchFeatureTab(currentFeatureTab);
+    }
+
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
       
-      let bg = "bg-emerald-600/90 border-emerald-500 text-white";
-      let icon = "fa-circle-check";
+      let borderColor = 'border-emerald-500/40';
+      let icon = 'fa-circle-check text-emerald-400';
       if (type === 'info') {
-        bg = "bg-brand-600/90 border-brand-500 text-white";
-        icon = "fa-circle-info";
+        borderColor = 'border-sky-500/40';
+        icon = 'fa-circle-info text-sky-400';
       } else if (type === 'error') {
-        bg = "bg-red-600/90 border-red-500 text-white";
-        icon = "fa-triangle-exclamation";
+        borderColor = 'border-red-500/40';
+        icon = 'fa-circle-exclamation text-red-400';
       }
 
-      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl flex items-center gap-3 text-xs font-extrabold backdrop-blur-md transition-all duration-300 translate-y-4 opacity-0 ${bg}`;
-      toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i> <span>${escapeHTML(message)}</span>`;
+      toast.className = `glass-card rounded-xl px-4 py-3 border ${borderColor} text-white text-xs font-bold flex items-center gap-3 shadow-2xl transition-all duration-300 opacity-0 translate-y-2 pointer-events-auto`;
+      toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${escapeHTML(message)}</span>`;
       
       container.appendChild(toast);
-      setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
+      setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-2'), 10);
 
       setTimeout(() => {
-        toast.classList.add('translate-y-4', 'opacity-0');
+        toast.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => toast.remove(), 300);
       }, 3500);
     }
 
     function escapeHTML(str) {
       if (!str) return '';
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
   </script>
 </body>
