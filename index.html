@@ -15,18 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
 
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -161,31 +150,6 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white relative">
-
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAijXCsoF0S5BxE8x6UBoHmrHfJBqiEuKI",
-    authDomain: "web-prueba-bd043.firebaseapp.com",
-    projectId: "web-prueba-bd043",
-    storageBucket: "web-prueba-bd043.firebasestorage.app",
-    messagingSenderId: "165726822435",
-    appId: "1:165726822435:web:d0398c4b2229fe49111196",
-    measurementId: "G-30FQDYJ12Z"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
 
   <!-- Interactive Background Canvas Particles -->
   <canvas id="particleCanvas"></canvas>
@@ -614,10 +578,10 @@
           <i class="fa-solid fa-user-shield"></i>
         </div>
         <h3 class="text-2xl font-black text-white">Acceso Modo Staff</h3>
-        <p class="text-slate-400 text-xs mt-1">Ingresa tus credenciales o contraseña de administrador</p>
+        <p class="text-slate-400 text-xs mt-1">Ingresa tus credenciales de Firebase o contraseña de administrador</p>
       </div>
 
-      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+      <form onsubmit="handleAdminLoginRouter(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-black text-slate-300 uppercase mb-2">Correo Electrónico Staff</label>
           <input type="email" id="adminEmailInput" placeholder="staff@omertarp.com" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
@@ -867,7 +831,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAijXCsoF0S5BxE8x6UBoHmrHfJBqiEuKI",
@@ -883,10 +847,54 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    window.handleFirebaseAdminLogin = async function(e) {
-      e.preventDefault();
-      const email = document.getElementById('adminEmailInput').value;
-      const password = document.getElementById('adminPasswordInput').value;
+    // Enviar Solicitud de Whitelist a Firestore
+    window.submitWhitelistToFirebase = async function(appData) {
+      try {
+        await addDoc(collection(db, "whitelist_applications"), {
+          ...appData,
+          status: 'pending',
+          createdAt: serverTimestamp()
+        });
+        window.showToast("¡Solicitud enviada a Firebase con éxito! El Staff la revisará.", "success");
+        document.getElementById('whitelistForm').reset();
+        window.navigateTo('inicio');
+      } catch (error) {
+        console.error("Error al enviar solicitud:", error);
+        window.showToast("Error al enviar la solicitud: " + error.message, "error");
+      }
+    };
+
+    // Cargar Solicitudes desde Firestore para el Panel Staff
+    window.fetchWhitelistAppsFromFirebase = async function() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "whitelist_applications"));
+        const apps = [];
+        querySnapshot.forEach((docSnap) => {
+          apps.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        window.whitelistAppsData = apps;
+        window.renderWhitelistApplications();
+        window.updateWhitelistBadge();
+      } catch (error) {
+        console.error("Error al obtener solicitudes:", error);
+      }
+    };
+
+    // Actualizar Estado de Solicitud en Firebase (Aprobada / Rechazada)
+    window.updateWhitelistAppStatusFirebase = async function(id, newStatus) {
+      try {
+        const docRef = doc(db, "whitelist_applications", id);
+        await updateDoc(docRef, { status: newStatus });
+        window.showToast(`Solicitud ${newStatus === 'approved' ? 'aprobada' : 'rechazada'} correctamente`, "success");
+        window.fetchWhitelistAppsFromFirebase();
+      } catch (error) {
+        console.error("Error al actualizar estado:", error);
+        window.showToast("Error al actualizar estado", "error");
+      }
+    };
+
+    // Login Admin Firebase
+    window.handleFirebaseAdminLogin = async function(email, password) {
       const errorEl = document.getElementById('adminLoginError');
       const errorText = document.getElementById('errorText');
 
@@ -900,6 +908,7 @@
           window.isAdminLoggedIn = true;
           window.closeAdminModal();
           window.updateAdminUI();
+          window.fetchWhitelistAppsFromFirebase();
           window.showToast("¡Sesión de Staff iniciada vía Firebase!", "success");
         } else {
           await signOut(auth);
@@ -918,6 +927,7 @@
         if (userDoc.exists() && userDoc.data().role === "admin") {
           window.isAdminLoggedIn = true;
           window.updateAdminUI();
+          window.fetchWhitelistAppsFromFirebase();
         }
       }
     });
@@ -1042,12 +1052,39 @@
     let currentPatchCategory = 'ALL';
     let isAdminLoggedIn = false;
 
-    // Función auxiliar para escapar HTML y prevenir XSS
     function escapeHTML(str) {
       if (!str) return '';
       return str.replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
       );
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let bg = 'bg-emerald-600 text-white';
+      let icon = 'fa-circle-check';
+      if (type === 'error') {
+        bg = 'bg-red-600 text-white';
+        icon = 'fa-triangle-exclamation';
+      } else if (type === 'info') {
+        bg = 'bg-sky-600 text-white';
+        icon = 'fa-circle-info';
+      }
+
+      toast.className = `px-4 py-3 rounded-xl shadow-2xl ${bg} font-bold text-xs flex items-center gap-2 transform translate-y-5 opacity-0 transition-all duration-300 pointer-events-auto`;
+      toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i> <span>${escapeHTML(message)}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-5', 'opacity-0');
+      }, 50);
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-5', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
     }
 
     function navigateTo(route) {
@@ -1190,9 +1227,6 @@
       const storedPatches = localStorage.getItem('omerta_rp_patches');
       patchesData = storedPatches ? JSON.parse(storedPatches) : [...DEFAULT_PATCHES];
 
-      const storedWl = localStorage.getItem('omerta_rp_whitelist_apps');
-      whitelistAppsData = storedWl ? JSON.parse(storedWl) : [];
-
       const storedCats = localStorage.getItem('omerta_rp_whitelist_categories');
       whitelistCategories = storedCats ? JSON.parse(storedCats) : [...DEFAULT_CATEGORIES];
 
@@ -1204,7 +1238,6 @@
       localStorage.setItem('omerta_rp_rules', JSON.stringify(rulesData));
       localStorage.setItem('omerta_rp_feature_data', JSON.stringify(featureData));
       localStorage.setItem('omerta_rp_patches', JSON.stringify(patchesData));
-      localStorage.setItem('omerta_rp_whitelist_apps', JSON.stringify(whitelistAppsData));
       localStorage.setItem('omerta_rp_whitelist_categories', JSON.stringify(whitelistCategories));
       localStorage.setItem('omerta_rp_whitelist_questions', JSON.stringify(whitelistQuestions));
     }
@@ -1697,14 +1730,18 @@
       setTimeout(() => modal.classList.add('hidden'), 300);
     }
 
-    function handleAdminLogin(e) {
+    function handleAdminLoginRouter(e) {
       e.preventDefault();
+      const email = document.getElementById('adminEmailInput').value.trim();
       const pass = document.getElementById('adminPasswordInput').value;
+
       if (pass === 'admin123') {
         isAdminLoggedIn = true;
         closeAdminModal();
         updateAdminUI();
         showToast("¡Modo Staff activado con éxito!", "success");
+      } else if (email) {
+        window.handleFirebaseAdminLogin(email, pass);
       } else {
         document.getElementById('adminLoginError').classList.remove('hidden');
       }
@@ -1752,7 +1789,7 @@
       switchFeatureTab(currentFeatureTab);
     }
 
-    // Funciones de Whitelist y Formulario
+    // Funciones de Whitelist y Formulario Dinámico
     function renderWhitelistFormBuilder() {
       const container = document.getElementById('dynamicCategoriesContainer');
       if (!container) return;
@@ -1831,10 +1868,7 @@
         }
       });
 
-      const newApp = {
-        id: 'wl-' + Date.now(),
-        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }),
-        status: 'pending',
+      const applicationPayload = {
         discord,
         age,
         charName,
@@ -1842,26 +1876,19 @@
         charBirth,
         charApp,
         charLore,
-        answers
+        answers,
+        submittedAt: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
       };
 
-      whitelistAppsData.unshift(newApp);
-      saveData();
-      updateWhitelistBadge();
-      document.getElementById('whitelistForm').reset();
-      showToast("¡Solicitud de Whitelist enviada con éxito!", "success");
-      navigateTo('inicio');
-    }
-
-    function updateWhitelistBadge() {
-      const countEl = document.getElementById('pendingAppsCount');
-      if (countEl) {
-        const pending = whitelistAppsData.filter(a => a.status === 'pending').length;
-        countEl.textContent = pending;
+      if (typeof window.submitWhitelistToFirebase === 'function') {
+        window.submitWhitelistToFirebase(applicationPayload);
+      } else {
+        showToast("Error de conexión con Firebase", "error");
       }
     }
 
     function showWhitelistManagerView() {
+      if (!isAdminLoggedIn) return;
       document.getElementById('whitelistFormWrapper').classList.add('hidden');
       document.getElementById('whitelistAdminPanel').classList.remove('hidden');
       document.getElementById('btnViewApps').classList.add('hidden');
@@ -1870,15 +1897,10 @@
     }
 
     function showWhitelistFormView() {
-      const formWrapper = document.getElementById('whitelistFormWrapper');
-      const adminPanel = document.getElementById('whitelistAdminPanel');
-      const btnViewApps = document.getElementById('btnViewApps');
-      const btnReturnForm = document.getElementById('btnReturnForm');
-      
-      if (formWrapper) formWrapper.classList.remove('hidden');
-      if (adminPanel) adminPanel.classList.add('hidden');
-      if (btnViewApps) btnViewApps.classList.remove('hidden');
-      if (btnReturnForm) btnReturnForm.classList.add('hidden');
+      document.getElementById('whitelistFormWrapper').classList.remove('hidden');
+      document.getElementById('whitelistAdminPanel').classList.add('hidden');
+      document.getElementById('btnViewApps').classList.remove('hidden');
+      document.getElementById('btnReturnForm').classList.add('hidden');
     }
 
     function renderWhitelistApplications() {
@@ -1887,8 +1909,9 @@
       if (!container) return;
       container.innerHTML = '';
 
-      if (whitelistAppsData.length === 0) {
+      if (!whitelistAppsData || whitelistAppsData.length === 0) {
         emptyState.classList.remove('hidden');
+        updateWhitelistBadge();
         return;
       } else {
         emptyState.classList.add('hidden');
@@ -1897,75 +1920,74 @@
       whitelistAppsData.forEach(app => {
         const card = document.createElement('div');
         card.className = "glass-card rounded-2xl p-6 border border-slate-800 space-y-4";
-
+        
         let statusBadge = '';
         if (app.status === 'approved') {
-          statusBadge = '<span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30">Aprobada</span>';
+          statusBadge = `<span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30">Aprobada</span>`;
         } else if (app.status === 'rejected') {
-          statusBadge = '<span class="px-3 py-1 rounded-full bg-red-500/20 text-red-400 font-bold text-xs border border-red-500/30">Rechazada</span>';
+          statusBadge = `<span class="px-3 py-1 rounded-full bg-red-500/20 text-red-400 font-bold text-xs border border-red-500/30">Rechazada</span>`;
         } else {
-          statusBadge = '<span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xs border border-amber-500/30">Pendiente</span>';
+          statusBadge = `<span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xs border border-amber-500/30">Pendiente</span>`;
         }
 
         let answersHTML = '';
         if (app.answers) {
           for (const [qText, ans] of Object.entries(app.answers)) {
-            answersHTML += `<div class="text-xs mt-2"><strong class="text-slate-300">${escapeHTML(qText)}:</strong> <p class="text-slate-400 mt-0.5">${escapeHTML(ans)}</p></div>`;
+            answersHTML += `
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 space-y-1">
+                <span class="text-xs font-bold text-sky-400">${escapeHTML(qText)}</span>
+                <p class="text-xs text-slate-300 whitespace-pre-line">${escapeHTML(ans)}</p>
+              </div>
+            `;
           }
         }
 
+        let actionButtons = '';
+        if (isAdminLoggedIn) {
+          actionButtons = `
+            <div class="flex items-center gap-3 pt-3 border-t border-slate-800">
+              <button onclick="updateWhitelistAppStatusFirebase('${app.id}', 'approved')" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all"><i class="fa-solid fa-check mr-1"></i> Aprobar</button>
+              <button onclick="updateWhitelistAppStatusFirebase('${app.id}', 'rejected')" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition-all"><i class="fa-solid fa-xmark mr-1"></i> Rechazar</button>
+            </div>
+          `;
+        }
+
         card.innerHTML = `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-            <div>
-              <div class="flex items-center gap-2">
-                <h4 class="text-base font-black text-white">${escapeHTML(app.charName)}</h4>
-                <span class="text-xs text-slate-400">(${escapeHTML(app.discord)})</span>
-              </div>
-              <p class="text-xs text-slate-400 mt-0.5">Edad real: ${app.age} | Edad IC: ${app.charAge} | Nacimiento: ${escapeHTML(app.charBirth)}</p>
-            </div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
             <div class="flex items-center gap-3">
+              <h4 class="text-base font-black text-white">${escapeHTML(app.charName)} <span class="text-xs text-slate-400 font-normal">(${escapeHTML(app.discord)})</span></h4>
               ${statusBadge}
-              <span class="text-xs text-slate-500">${app.date}</span>
             </div>
+            <span class="text-xs text-slate-400">Enviado: ${escapeHTML(app.submittedAt || 'Reciente')}</span>
           </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="bg-slate-900/40 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 block font-bold">Edad Real</span><span class="text-white font-extrabold">${escapeHTML(app.age)} años</span></div>
+            <div class="bg-slate-900/40 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 block font-bold">Edad IC</span><span class="text-white font-extrabold">${escapeHTML(app.charAge)} años</span></div>
+            <div class="bg-slate-900/40 p-2.5 rounded-xl border border-slate-800 col-span-2"><span class="text-slate-400 block font-bold">Lugar de Nacimiento</span><span class="text-white font-extrabold">${escapeHTML(app.charBirth)}</span></div>
+          </div>
+
           <div class="space-y-2 text-xs">
-            <div><strong class="text-slate-300">Apariencia:</strong> <p class="text-slate-400">${escapeHTML(app.charApp)}</p></div>
-            <div><strong class="text-slate-300">Historia / Lore:</strong> <p class="text-slate-400">${escapeHTML(app.charLore)}</p></div>
-            <div class="pt-2 border-t border-slate-800/60"><strong class="text-sky-400 block mb-1">Respuestas del Test:</strong> ${answersHTML}</div>
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80"><span class="font-bold text-sky-400 block mb-1">Apariencia y Rasgos:</span><p class="text-slate-300">${escapeHTML(app.charApp)}</p></div>
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80"><span class="font-bold text-sky-400 block mb-1">Historia / Lore:</span><p class="text-slate-300 whitespace-pre-line">${escapeHTML(app.charLore)}</p></div>
+            ${answersHTML}
           </div>
-          <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
-            <button onclick="updateAppStatus('${app.id}', 'approved')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Aprobar</button>
-            <button onclick="updateAppStatus('${app.id}', 'rejected')" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs">Rechazar</button>
-            <button onclick="deleteApp('${app.id}')" class="px-3 py-1.5 rounded-lg glass-card hover:border-red-500 text-slate-400 hover:text-red-400 font-bold text-xs">Eliminar</button>
-          </div>
+          ${actionButtons}
         `;
         container.appendChild(card);
       });
+      updateWhitelistBadge();
     }
 
-    function updateAppStatus(id, status) {
-      const app = whitelistAppsData.find(a => a.id === id);
-      if (app) {
-        app.status = status;
-        saveData();
-        renderWhitelistApplications();
-        updateWhitelistBadge();
-        showToast(`Solicitud ${status === 'approved' ? 'aprobada' : 'rechazada'}`, status === 'approved' ? 'success' : 'info');
-      }
+    function updateWhitelistBadge() {
+      const countEl = document.getElementById('pendingAppsCount');
+      if (!countEl) return;
+      const pending = whitelistAppsData.filter(a => !a.status || a.status === 'pending').length;
+      countEl.textContent = pending;
     }
 
-    function deleteApp(id) {
-      if (confirm("¿Eliminar esta solicitud?")) {
-        whitelistAppsData = whitelistAppsData.filter(a => a.id !== id);
-        saveData();
-        renderWhitelistApplications();
-        updateWhitelistBadge();
-        showToast("Solicitud eliminada", "info");
-      }
-    }
-
-    // Modales de Categoría y Pregunta Whitelist
     function openAddCategoryModal() {
+      if (!isAdminLoggedIn) return;
       const modal = document.getElementById('categoryModal');
       modal.classList.remove('hidden');
       setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
@@ -1989,13 +2011,14 @@
       saveData();
       renderWhitelistFormBuilder();
       closeCategoryModal();
-      showToast("Categoría creada con éxito", "success");
+      showToast("Categoría añadida con éxito", "success");
     }
 
-    function deleteCategory(id) {
-      if (confirm("¿Eliminar categoría y sus preguntas asociadas?")) {
-        whitelistCategories = whitelistCategories.filter(c => c.id !== id);
-        whitelistQuestions = whitelistQuestions.filter(q => q.categoryId !== id);
+    function deleteCategory(catId) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Estás seguro de eliminar esta categoría y sus preguntas asociadas?")) {
+        whitelistCategories = whitelistCategories.filter(c => c.id !== catId);
+        whitelistQuestions = whitelistQuestions.filter(q => q.categoryId !== catId);
         saveData();
         renderWhitelistFormBuilder();
         showToast("Categoría eliminada", "info");
@@ -2003,10 +2026,7 @@
     }
 
     function openAddQuestionModal() {
-      const modal = document.getElementById('addQuestionModal');
-      modal.classList.remove('hidden');
-      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
-      
+      if (!isAdminLoggedIn) return;
       const select = document.getElementById('questionCategorySelect');
       select.innerHTML = '';
       whitelistCategories.forEach(cat => {
@@ -2016,6 +2036,9 @@
         select.appendChild(opt);
       });
 
+      const modal = document.getElementById('addQuestionModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
       document.getElementById('questionTextInput').value = "";
       document.getElementById('questionPlaceholderInput').value = "";
     }
@@ -2048,36 +2071,14 @@
       showToast("Pregunta añadida con éxito", "success");
     }
 
-    function deleteQuestion(id) {
-      if (confirm("¿Eliminar esta pregunta?")) {
-        whitelistQuestions = whitelistQuestions.filter(q => q.id !== id);
+    function deleteQuestion(qId) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Estás seguro de eliminar esta pregunta?")) {
+        whitelistQuestions = whitelistQuestions.filter(q => q.id !== qId);
         saveData();
         renderWhitelistFormBuilder();
         showToast("Pregunta eliminada", "info");
       }
-    }
-
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-      if (!container) return;
-
-      const toast = document.createElement('div');
-      const bgColors = {
-        success: 'bg-emerald-600 border-emerald-500 text-white',
-        info: 'bg-sky-600 border-sky-500 text-white',
-        error: 'bg-red-600 border-red-500 text-white'
-      };
-
-      toast.className = `px-5 py-3 rounded-xl border shadow-xl text-xs font-bold transition-all duration-300 transform translate-y-5 opacity-0 ${bgColors[type] || bgColors.success}`;
-      toast.innerHTML = `<div class="flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> ${escapeHTML(message)}</div>`;
-      
-      container.appendChild(toast);
-      setTimeout(() => toast.classList.remove('translate-y-5', 'opacity-0'), 10);
-
-      setTimeout(() => {
-        toast.classList.add('translate-y-5', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
     }
   </script>
 </body>
