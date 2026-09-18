@@ -15,108 +15,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<!-- MODAL DE ACCESO MODO STAFF CON FIREBASE -->
-<div id="adminPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 transition-all duration-300 opacity-0 scale-95">
-  <div class="glass-card rounded-2xl border border-brand-500/40 max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
-    <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-
-    <div class="text-center mb-6">
-      <div class="w-14 h-14 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-500 flex items-center justify-center mx-auto text-2xl mb-4 animate-bounce">
-        <i class="fa-solid fa-user-shield"></i>
-      </div>
-      <h3 class="text-2xl font-black text-white">Acceso Modo Staff</h3>
-      <p class="text-slate-400 text-xs mt-1">Ingresa tus credenciales de administrador de Firebase</p>
-    </div>
-
-    <form onsubmit="handleFirebaseAdminLogin(event)" class="space-y-4">
-      <div>
-        <label class="block text-xs font-black text-slate-300 uppercase mb-2">Correo Electrónico Staff</label>
-        <input type="email" id="adminEmailInput" required placeholder="staff@caracasvibes2.com" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
-      </div>
-      <div>
-        <label class="block text-xs font-black text-slate-300 uppercase mb-2">Contraseña</label>
-        <input type="password" id="adminPasswordInput" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
-      </div>
-      <div id="adminLoginError" class="text-red-400 text-xs hidden font-bold flex items-center gap-2">
-        <i class="fa-solid fa-triangle-exclamation"></i> <span id="errorText">Credenciales inválidas o sin permisos.</span>
-      </div>
-      <button type="submit" class="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm transition-all shadow-lg shadow-brand-500/30 hover:scale-[1.02] active:scale-95">
-        Iniciar Sesión con Firebase
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- SCRIPTS DE FIREBASE Y LÓGICA DE AUTENTICACIÓN -->
 <script type="module">
-  // Importar los SDKs necesarios de Firebase desde los CDN oficiales
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Configuración de tu proyecto Firebase (Sustituye con tus credenciales reales)
-  const firebaseConfig = {
-    apiKey: "AIzaSyAijXCsoF0S5BxE8x6UBoHmrHfJBqiEuKI
-    authDomain: "web-prueba-bd043.firebaseapp.com",
-    projectId: "web-prueba-bd043",
-    storageBucket: "web-prueba-bd043.firebasestorage.app",
-    messagingSenderId: "165726822435",
-    appId: "1:165726822435:web:d0398c4b2229fe49111196",
-    measurementId: "G-30FQDYJ12Z"
-  };
 
-  // Inicializar Firebase
+  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Exponer funciones al ámbito global para conectarlas con los botones existentes
-  window.handleFirebaseAdminLogin = async function(e) {
-    e.preventDefault();
-    const email = document.getElementById('adminEmailInput').value;
-    const password = document.getElementById('adminPasswordInput').value;
-    const errorEl = document.getElementById('adminLoginError');
-    const errorText = document.getElementById('errorText');
-
-    try {
-      // 1. Autenticar 
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // 2. Verificar si el usuario pertenece al rol de Staff/Admin
-      const userDocRef = doc(db, "staff_users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists() && userDoc.data().role === "admin") {
-        window.isAdminLoggedIn = true;
-        window.closeAdminModal();
-        window.updateAdminUI();
-        window.showToast("¡Sesión de Staff iniciada vía Firebase!", "success");
-      } else {
-        await signOut(auth);
-        errorText.textContent = "No tienes permisos de administrador en la base de datos.";
-        errorEl.classList.remove('hidden');
-      }
-    } catch (error) {
-      errorText.textContent = "Error: " + error.message;
-      errorEl.classList.remove('hidden');
-    }
-  };
-
-  // Mantener la sesión 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const userDoc = await getDoc(doc(db, "staff_users", user.uid));
-      if (userDoc.exists() && userDoc.data().role === "admin") {
-        window.isAdminLoggedIn = true;
-        window.updateAdminUI();
-      }
-    }
-  });
+  const analytics = getAnalytics(app);
 </script>
-
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -251,6 +161,31 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white relative">
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAijXCsoF0S5BxE8x6UBoHmrHfJBqiEuKI",
+    authDomain: "web-prueba-bd043.firebaseapp.com",
+    projectId: "web-prueba-bd043",
+    storageBucket: "web-prueba-bd043.firebasestorage.app",
+    messagingSenderId: "165726822435",
+    appId: "1:165726822435:web:d0398c4b2229fe49111196",
+    measurementId: "G-30FQDYJ12Z"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
 
   <!-- Interactive Background Canvas Particles -->
   <canvas id="particleCanvas"></canvas>
@@ -667,7 +602,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE ACCESO ADMIN -->
+  <!-- MODAL DE ACCESO ADMIN / STAFF -->
   <div id="adminPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 transition-all duration-300 opacity-0 scale-95">
     <div class="glass-card rounded-2xl border border-brand-500/40 max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
       <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
@@ -676,19 +611,23 @@
 
       <div class="text-center mb-6">
         <div class="w-14 h-14 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-500 flex items-center justify-center mx-auto text-2xl mb-4 animate-bounce">
-          <i class="fa-solid fa-lock"></i>
+          <i class="fa-solid fa-user-shield"></i>
         </div>
         <h3 class="text-2xl font-black text-white">Acceso Modo Staff</h3>
-        <p class="text-slate-400 text-xs mt-1">Ingresa la clave administrativa </p>
+        <p class="text-slate-400 text-xs mt-1">Ingresa tus credenciales o contraseña de administrador</p>
       </div>
 
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-black text-slate-300 uppercase mb-2">Contraseña de Staff</label>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-2">Correo Electrónico Staff</label>
+          <input type="email" id="adminEmailInput" placeholder="staff@omertarp.com" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-2">Contraseña</label>
           <input type="password" id="adminPasswordInput" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
         </div>
         <div id="adminLoginError" class="text-red-400 text-xs hidden font-bold flex items-center gap-2">
-          <i class="fa-solid fa-triangle-exclamation"></i> Contraseña incorrecta.
+          <i class="fa-solid fa-triangle-exclamation"></i> <span id="errorText">Credenciales inválidas o sin permisos.</span>
         </div>
         <button type="submit" class="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm transition-all shadow-lg shadow-brand-500/30 hover:scale-[1.02] active:scale-95">
           Iniciar Sesión
@@ -756,7 +695,7 @@
         <div>
           <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Tipo de Campo de Respuesta</label>
           <select id="questionTypeSelect" required class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-emerald-500 text-sm bg-slate-900">
-            <option value="textarea">Área de texto largo (Ideal para desarrollo/loren/casos)</option>
+            <option value="textarea">Área de texto largo (Ideal para desarrollo/lore/casos)</option>
             <option value="input">Respuesta corta (Ideal para definiciones breves o una línea)</option>
           </select>
         </div>
@@ -924,6 +863,66 @@
     </div>
   </footer>
 
+  <!-- SCRIPTS DE FIREBASE Y LÓGICA GENERAL -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAijXCsoF0S5BxE8x6UBoHmrHfJBqiEuKI",
+      authDomain: "web-prueba-bd043.firebaseapp.com",
+      projectId: "web-prueba-bd043",
+      storageBucket: "web-prueba-bd043.firebasestorage.app",
+      messagingSenderId: "165726822435",
+      appId: "1:165726822435:web:d0398c4b2229fe49111196",
+      measurementId: "G-30FQDYJ12Z"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.handleFirebaseAdminLogin = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('adminEmailInput').value;
+      const password = document.getElementById('adminPasswordInput').value;
+      const errorEl = document.getElementById('adminLoginError');
+      const errorText = document.getElementById('errorText');
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userDocRef = doc(db, "staff_users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists() && userDoc.data().role === "admin") {
+          window.isAdminLoggedIn = true;
+          window.closeAdminModal();
+          window.updateAdminUI();
+          window.showToast("¡Sesión de Staff iniciada vía Firebase!", "success");
+        } else {
+          await signOut(auth);
+          errorText.textContent = "No tienes permisos de administrador en la base de datos.";
+          errorEl.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorText.textContent = "Error: " + error.message;
+        errorEl.classList.remove('hidden');
+      }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "staff_users", user.uid));
+        if (userDoc.exists() && userDoc.data().role === "admin") {
+          window.isAdminLoggedIn = true;
+          window.updateAdminUI();
+        }
+      }
+    });
+  </script>
+
   <script>
     const DEFAULT_RULES = [
       {
@@ -1042,6 +1041,14 @@
     let currentFeatureTab = 'facciones';
     let currentPatchCategory = 'ALL';
     let isAdminLoggedIn = false;
+
+    // Función auxiliar para escapar HTML y prevenir XSS
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
 
     function navigateTo(route) {
       const views = ['inicio', 'normativas', 'whitelist', 'notas-de-parche'];
@@ -1745,40 +1752,332 @@
       switchFeatureTab(currentFeatureTab);
     }
 
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      
-      let borderColor = 'border-emerald-500/40';
-      let icon = 'fa-circle-check text-emerald-400';
-      if (type === 'info') {
-        borderColor = 'border-sky-500/40';
-        icon = 'fa-circle-info text-sky-400';
-      } else if (type === 'error') {
-        borderColor = 'border-red-500/40';
-        icon = 'fa-circle-exclamation text-red-400';
-      }
+    // Funciones de Whitelist y Formulario
+    function renderWhitelistFormBuilder() {
+      const container = document.getElementById('dynamicCategoriesContainer');
+      if (!container) return;
+      container.innerHTML = '';
 
-      toast.className = `glass-card rounded-xl px-4 py-3 border ${borderColor} text-white text-xs font-bold flex items-center gap-3 shadow-2xl transition-all duration-300 opacity-0 translate-y-2 pointer-events-auto`;
-      toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${escapeHTML(message)}</span>`;
-      
-      container.appendChild(toast);
-      setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-2'), 10);
+      whitelistCategories.forEach(cat => {
+        const catDiv = document.createElement('div');
+        catDiv.className = "border-t border-slate-800/80 pt-6 space-y-4";
+        
+        const questionsInCat = whitelistQuestions.filter(q => q.categoryId === cat.id);
+        
+        let questionsHTML = '';
+        questionsInCat.forEach(q => {
+          let inputHTML = '';
+          if (q.type === 'textarea') {
+            inputHTML = `<textarea name="${q.id}" rows="3" required placeholder="${escapeHTML(q.placeholder)}" class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-sky-500"></textarea>`;
+          } else {
+            inputHTML = `<input type="text" name="${q.id}" required placeholder="${escapeHTML(q.placeholder)}" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-sky-500 text-sm" />`;
+          }
 
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
+          let adminQActions = '';
+          if (isAdminLoggedIn) {
+            adminQActions = `
+              <div class="flex items-center gap-2 mt-1">
+                <button type="button" onclick="deleteQuestion('${q.id}')" class="text-xs text-red-400 hover:text-red-300 font-bold"><i class="fa-solid fa-trash"></i> Eliminar pregunta</button>
+              </div>
+            `;
+          }
+
+          questionsHTML += `
+            <div>
+              <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">${escapeHTML(q.text)}</label>
+              ${inputHTML}
+              ${adminQActions}
+            </div>
+          `;
+        });
+
+        let adminCatActions = '';
+        if (isAdminLoggedIn) {
+          adminCatActions = `
+            <div class="flex items-center gap-2 pt-2">
+              <button type="button" onclick="deleteCategory('${cat.id}')" class="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold"><i class="fa-solid fa-trash"></i> Eliminar Categoría</button>
+            </div>
+          `;
+        }
+
+        catDiv.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-black text-sky-400 mb-2">${escapeHTML(cat.name)}</h3>
+            ${adminCatActions}
+          </div>
+          <div class="space-y-4">
+            ${questionsHTML || '<p class="text-xs text-slate-500 italic">No hay preguntas en esta categoría.</p>'}
+          </div>
+        `;
+        container.appendChild(catDiv);
+      });
     }
 
-    function escapeHTML(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    function handleWhitelistSubmit(e) {
+      e.preventDefault();
+      const discord = document.getElementById('wlDiscord').value.trim();
+      const age = document.getElementById('wlAge').value.trim();
+      const charName = document.getElementById('wlCharName').value.trim();
+      const charAge = document.getElementById('wlCharAge').value.trim();
+      const charBirth = document.getElementById('wlCharBirth').value.trim();
+      const charApp = document.getElementById('wlCharApp').value.trim();
+      const charLore = document.getElementById('wlCharLore').value.trim();
+
+      const answers = {};
+      whitelistQuestions.forEach(q => {
+        const field = document.querySelector(`[name="${q.id}"]`);
+        if (field) {
+          answers[q.text] = field.value.trim();
+        }
+      });
+
+      const newApp = {
+        id: 'wl-' + Date.now(),
+        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }),
+        status: 'pending',
+        discord,
+        age,
+        charName,
+        charAge,
+        charBirth,
+        charApp,
+        charLore,
+        answers
+      };
+
+      whitelistAppsData.unshift(newApp);
+      saveData();
+      updateWhitelistBadge();
+      document.getElementById('whitelistForm').reset();
+      showToast("¡Solicitud de Whitelist enviada con éxito!", "success");
+      navigateTo('inicio');
+    }
+
+    function updateWhitelistBadge() {
+      const countEl = document.getElementById('pendingAppsCount');
+      if (countEl) {
+        const pending = whitelistAppsData.filter(a => a.status === 'pending').length;
+        countEl.textContent = pending;
+      }
+    }
+
+    function showWhitelistManagerView() {
+      document.getElementById('whitelistFormWrapper').classList.add('hidden');
+      document.getElementById('whitelistAdminPanel').classList.remove('hidden');
+      document.getElementById('btnViewApps').classList.add('hidden');
+      document.getElementById('btnReturnForm').classList.remove('hidden');
+      renderWhitelistApplications();
+    }
+
+    function showWhitelistFormView() {
+      const formWrapper = document.getElementById('whitelistFormWrapper');
+      const adminPanel = document.getElementById('whitelistAdminPanel');
+      const btnViewApps = document.getElementById('btnViewApps');
+      const btnReturnForm = document.getElementById('btnReturnForm');
+      
+      if (formWrapper) formWrapper.classList.remove('hidden');
+      if (adminPanel) adminPanel.classList.add('hidden');
+      if (btnViewApps) btnViewApps.classList.remove('hidden');
+      if (btnReturnForm) btnReturnForm.classList.add('hidden');
+    }
+
+    function renderWhitelistApplications() {
+      const container = document.getElementById('whitelistApplicationsContainer');
+      const emptyState = document.getElementById('emptyWhitelistState');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (whitelistAppsData.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      whitelistAppsData.forEach(app => {
+        const card = document.createElement('div');
+        card.className = "glass-card rounded-2xl p-6 border border-slate-800 space-y-4";
+
+        let statusBadge = '';
+        if (app.status === 'approved') {
+          statusBadge = '<span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30">Aprobada</span>';
+        } else if (app.status === 'rejected') {
+          statusBadge = '<span class="px-3 py-1 rounded-full bg-red-500/20 text-red-400 font-bold text-xs border border-red-500/30">Rechazada</span>';
+        } else {
+          statusBadge = '<span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xs border border-amber-500/30">Pendiente</span>';
+        }
+
+        let answersHTML = '';
+        if (app.answers) {
+          for (const [qText, ans] of Object.entries(app.answers)) {
+            answersHTML += `<div class="text-xs mt-2"><strong class="text-slate-300">${escapeHTML(qText)}:</strong> <p class="text-slate-400 mt-0.5">${escapeHTML(ans)}</p></div>`;
+          }
+        }
+
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="text-base font-black text-white">${escapeHTML(app.charName)}</h4>
+                <span class="text-xs text-slate-400">(${escapeHTML(app.discord)})</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">Edad real: ${app.age} | Edad IC: ${app.charAge} | Nacimiento: ${escapeHTML(app.charBirth)}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              ${statusBadge}
+              <span class="text-xs text-slate-500">${app.date}</span>
+            </div>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div><strong class="text-slate-300">Apariencia:</strong> <p class="text-slate-400">${escapeHTML(app.charApp)}</p></div>
+            <div><strong class="text-slate-300">Historia / Lore:</strong> <p class="text-slate-400">${escapeHTML(app.charLore)}</p></div>
+            <div class="pt-2 border-t border-slate-800/60"><strong class="text-sky-400 block mb-1">Respuestas del Test:</strong> ${answersHTML}</div>
+          </div>
+          <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+            <button onclick="updateAppStatus('${app.id}', 'approved')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Aprobar</button>
+            <button onclick="updateAppStatus('${app.id}', 'rejected')" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs">Rechazar</button>
+            <button onclick="deleteApp('${app.id}')" class="px-3 py-1.5 rounded-lg glass-card hover:border-red-500 text-slate-400 hover:text-red-400 font-bold text-xs">Eliminar</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateAppStatus(id, status) {
+      const app = whitelistAppsData.find(a => a.id === id);
+      if (app) {
+        app.status = status;
+        saveData();
+        renderWhitelistApplications();
+        updateWhitelistBadge();
+        showToast(`Solicitud ${status === 'approved' ? 'aprobada' : 'rechazada'}`, status === 'approved' ? 'success' : 'info');
+      }
+    }
+
+    function deleteApp(id) {
+      if (confirm("¿Eliminar esta solicitud?")) {
+        whitelistAppsData = whitelistAppsData.filter(a => a.id !== id);
+        saveData();
+        renderWhitelistApplications();
+        updateWhitelistBadge();
+        showToast("Solicitud eliminada", "info");
+      }
+    }
+
+    // Modales de Categoría y Pregunta Whitelist
+    function openAddCategoryModal() {
+      const modal = document.getElementById('categoryModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('categoryNameInput').value = "";
+    }
+
+    function closeCategoryModal() {
+      const modal = document.getElementById('categoryModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function saveCategory(e) {
+      e.preventDefault();
+      const name = document.getElementById('categoryNameInput').value.trim();
+      const newCat = {
+        id: 'cat-' + Date.now(),
+        name
+      };
+      whitelistCategories.push(newCat);
+      saveData();
+      renderWhitelistFormBuilder();
+      closeCategoryModal();
+      showToast("Categoría creada con éxito", "success");
+    }
+
+    function deleteCategory(id) {
+      if (confirm("¿Eliminar categoría y sus preguntas asociadas?")) {
+        whitelistCategories = whitelistCategories.filter(c => c.id !== id);
+        whitelistQuestions = whitelistQuestions.filter(q => q.categoryId !== id);
+        saveData();
+        renderWhitelistFormBuilder();
+        showToast("Categoría eliminada", "info");
+      }
+    }
+
+    function openAddQuestionModal() {
+      const modal = document.getElementById('addQuestionModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      
+      const select = document.getElementById('questionCategorySelect');
+      select.innerHTML = '';
+      whitelistCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.textContent = cat.name;
+        select.appendChild(opt);
+      });
+
+      document.getElementById('questionTextInput').value = "";
+      document.getElementById('questionPlaceholderInput').value = "";
+    }
+
+    function closeAddQuestionModal() {
+      const modal = document.getElementById('addQuestionModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function saveQuestion(e) {
+      e.preventDefault();
+      const categoryId = document.getElementById('questionCategorySelect').value;
+      const type = document.getElementById('questionTypeSelect').value;
+      const text = document.getElementById('questionTextInput').value.trim();
+      const placeholder = document.getElementById('questionPlaceholderInput').value.trim();
+
+      const newQ = {
+        id: 'q-' + Date.now(),
+        categoryId,
+        type,
+        text,
+        placeholder
+      };
+
+      whitelistQuestions.push(newQ);
+      saveData();
+      renderWhitelistFormBuilder();
+      closeAddQuestionModal();
+      showToast("Pregunta añadida con éxito", "success");
+    }
+
+    function deleteQuestion(id) {
+      if (confirm("¿Eliminar esta pregunta?")) {
+        whitelistQuestions = whitelistQuestions.filter(q => q.id !== id);
+        saveData();
+        renderWhitelistFormBuilder();
+        showToast("Pregunta eliminada", "info");
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const bgColors = {
+        success: 'bg-emerald-600 border-emerald-500 text-white',
+        info: 'bg-sky-600 border-sky-500 text-white',
+        error: 'bg-red-600 border-red-500 text-white'
+      };
+
+      toast.className = `px-5 py-3 rounded-xl border shadow-xl text-xs font-bold transition-all duration-300 transform translate-y-5 opacity-0 ${bgColors[type] || bgColors.success}`;
+      toast.innerHTML = `<div class="flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> ${escapeHTML(message)}</div>`;
+      
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-5', 'opacity-0'), 10);
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-5', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
     }
   </script>
 </body>
