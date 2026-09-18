@@ -1,84 +1,2113 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrativo</title>
-    <style>
-        /* Estilos generales adaptados para móviles y PC */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
-        .container { width: 100%; max-width: 400px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; margin-bottom: 20px; color: #333; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #007bff; border: none; border-radius: 4px; color: white; font-size: 16px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .error { color: red; font-size: 14px; text-align: center; margin-top: 10px; }
-        
-        /* Panel Oculto por defecto */
-        #admin-panel { display: none; }
-        .admin-dashboard { width: 100%; max-width: 800px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
-        /* Media Queries adicionales para asegurar adaptación móvil fluida */
-        @media (max-width: 480px) {
-            .container, .admin-dashboard { padding: 15px; }
-            input, button { font-size: 14px; padding: 10px; }
-        }
-    </style>
-</head>
-<body>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+  <title>OMERTA Roleplay - Portal Oficial & Whitelist</title>
+  <meta name="description" content="Portal oficial de OMERTA RP: Estado del servidor, normativas comunitarias, notas de parche y sistema de Whitelist en tiempo real." />
+  <meta name="theme-color" content="#30a9ff" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Public Sans Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Formulario de Login -->
-    <div class="container" id="login-container">
-        <h2>Acceso Admin</h2>
-        <div class="form-group">
-            <label for="email">Correo Electrónico:</label>
-            <input type="email5" id="email" placeholder="admin@tudominio.com" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" placeholder="********" required>
-        </div>
-        <button onclick="verificarLogin()">Entrar</button>
-        <div id="error-msg" class="error"></div>
-    </div>
-
-    <!-- Panel de Administración (Visible tras login exitoso) -->
-    <div class="admin-dashboard" id="admin-panel">
-        <h2>Panel de Control</h2>
-        <p>Bienvenido al sistema administrativo.</p>
-        <!-- Agrega aquí tus herramientas, tablas o controles -->
-        <button onclick="cerrarSesion()" style="background: #dc3545; margin-top: 20px;">Cerrar Sesión</button>
-    </div>
-
-    <script>
-        function verificarLogin() {
-            const emailInput = document.getElementById('email').value.trim();
-            const passwordInput = document.getElementById('password').value.trim();
-            const errorMsg = document.getElementById('error-msg');
-
-            // Credenciales de ejemplo (reemplaza con tu lógica de backend o base de datos)
-            const adminEmail = "admin@admin.com";
-            const adminPass = "123456";
-
-            if (emailInput === adminEmail && passwordInput === adminPass) {
-                // Ocultar login y mostrar panel móvil
-                document.getElementById('login-container').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                errorMsg.textContent = "";
-            } else {
-                errorMsg.textContent = "Correo o contraseña incorrectos.";
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef8ff',
+              100: '#d8f0ff',
+              400: '#38bdf8',
+              500: '#30a9ff',
+              600: '#1f82cb',
+              700: '#1a68a5',
+              900: '#0b0e14',
+              card: 'rgba(18, 24, 38, 0.75)',
+              border: 'rgba(48, 169, 255, 0.2)'
             }
+          },
+          fontFamily: {
+            sans: ['Public Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0b0e14;
+      color: #f0f4f8;
+      font-family: 'Public Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .glass-card {
+      background: rgba(18, 24, 38, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(48, 169, 255, 0.18);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    
+    .glass-nav {
+      background: rgba(11, 14, 20, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(48, 169, 255, 0.15);
+    }
+
+    .hero-glow {
+      background: radial-gradient(circle at 50% 30%, rgba(48, 169, 255, 0.22) 0%, rgba(11, 14, 20, 0.95) 75%),
+                  url('https://static.onx.gg/website/banners/onx_banner_botanist.webp') center/cover no-repeat fixed;
+    }
+
+    .animated-gradient-text {
+      background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 25%, #30a9ff 50%, #38bdf8 75%, #ffffff 100%);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shine 4s linear infinite;
+    }
+
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+    .animate-float {
+      animation: float-slow 5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(48, 169, 255, 0.3), 0 0 30px rgba(48, 169, 255, 0.1); }
+      50% { box-shadow: 0 0 25px rgba(48, 169, 255, 0.7), 0 0 50px rgba(48, 169, 255, 0.3); }
+    }
+    .glow-active {
+      animation: pulse-glow 3s infinite ease-in-out;
+    }
+
+    .page-view {
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .page-view.hidden-view {
+      display: none !important;
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    .page-view.active-view {
+      display: block !important;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tilt-card {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+      will-change: transform;
+    }
+    .tilt-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      border-color: rgba(48, 169, 255, 0.5);
+      box-shadow: 0 15px 35px -5px rgba(48, 169, 255, 0.25);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      opacity: 0;
+    }
+    .accordion-content.open {
+      opacity: 1;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0b0e14; }
+    ::-webkit-scrollbar-thumb { background: #1f82cb; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #30a9ff; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white relative">
+
+  <!-- Interactive Background Canvas Particles -->
+  <canvas id="particleCanvas"></canvas>
+
+  <header class="sticky top-0 z-50 glass-nav transition-all duration-300">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="#inicio" onclick="navigateTo('inicio')" class="flex items-center gap-3 group">
+        <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500/20 to-slate-900 border border-brand-500/50 flex items-center justify-center group-hover:border-brand-400 group-hover:scale-110 transition-all duration-300 shadow-[0_0_15px_rgba(48,169,255,0.2)]">
+          <span class="text-white font-black text-sm tracking-tighter relative z-10">O<span class="text-brand-400">R</span></span>
+          <div class="absolute inset-0 rounded-xl bg-brand-500/10 animate-pulse"></div>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl sm:text-2xl font-black tracking-widest text-white leading-none">
+            OMERTA <span class="text-brand-500 drop-shadow-[0_0_8px_rgba(48,169,255,0.6)]">RP</span>
+          </span>
+          <span class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">Roleplay Experience</span>
+        </div>
+      </a>
+
+      <div class="hidden md:flex items-center gap-6 font-bold text-sm">
+        <a href="#inicio" id="nav-inicio" onclick="navigateTo('inicio')" class="nav-link text-slate-300 hover:text-brand-500 transition-colors relative py-1 flex items-center gap-1.5">
+          <i class="fa-solid fa-house text-xs"></i> Inicio
+        </a>
+        <a href="#normativas" id="nav-normativas" onclick="navigateTo('normativas')" class="nav-link text-slate-300 hover:text-brand-500 transition-colors relative py-1 flex items-center gap-1.5">
+          <i class="fa-solid fa-book-bookmark text-brand-500 text-xs"></i> Normativas
+        </a>
+        <a href="#whitelist" id="nav-whitelist" onclick="navigateTo('whitelist')" class="nav-link text-slate-300 hover:text-sky-400 transition-colors relative py-1 flex items-center gap-1.5">
+          <i class="fa-solid fa-id-card text-sky-400 text-xs"></i> Whitelist
+        </a>
+        <a href="#notas-de-parche" id="nav-notas-de-parche" onclick="navigateTo('notas-de-parche')" class="nav-link text-slate-300 hover:text-emerald-400 transition-colors relative py-1 flex items-center gap-1.5">
+          <i class="fa-solid fa-code-compare text-emerald-400 text-xs"></i> Notas de Parche
+        </a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="adminToggleBtn" onclick="toggleAdminModal()" class="px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-slate-700 bg-slate-900/80 text-slate-300 hover:border-brand-500 hover:text-white hover:scale-105 active:scale-95">
+          <i class="fa-solid fa-user-shield text-brand-500 text-sm" id="adminIcon"></i>
+          <span id="adminBtnText">Modo Staff</span>
+        </button>
+
+        <a href="https://discord.gg" target="_blank" class="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-xs sm:text-sm transition-all duration-300 shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 flex items-center gap-2 hover:scale-105 active:scale-95">
+          <i class="fa-brands fa-discord text-base"></i>
+          <span class="hidden sm:inline">Discord</span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- VIEW 1: HOME (INICIO) -->
+  <main id="view-inicio" class="page-view active-view flex-1">
+    <section class="relative hero-glow pt-20 pb-28 md:pt-32 md:pb-40 px-4 z-10 overflow-hidden">
+      <div class="max-w-5xl mx-auto text-center space-y-8 relative z-10">
+        
+        <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full glass-card border-brand-500/40 text-brand-400 text-xs font-black uppercase tracking-widest animate-float shadow-lg shadow-brand-500/10">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+          <span id="serverStatusText">Servidor Online</span>
+          <span class="text-slate-600">|</span>
+          <span class="text-slate-200"><i class="fa-solid fa-users text-brand-500 mr-1.5 animate-pulse"></i> <span id="playerCount" class="font-bold text-white">184</span> / 200 Jugadores</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight">
+          Experiencia de Roleplay <br />
+          <span class="animated-gradient-text drop-shadow-[0_10px_20px_rgba(48,169,255,0.3)]">
+            Inmersiva & Seria
+          </span>
+        </h1>
+
+        <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
+          Bienvenido a OMERTA RP. Un servidor de GTA V FiveM con Whitelist estricta, economía realista y actualización constante de parches comunitarios.
+        </p>
+
+        <div class="flex flex-wrap items-center justify-center gap-5 pt-4">
+          <button onclick="navigateTo('whitelist')" class="glow-active px-8 py-4 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-sm sm:text-base transition-all duration-300 flex items-center gap-3 hover:-translate-y-1 hover:scale-105 active:scale-95">
+            <i class="fa-solid fa-id-card text-lg"></i>
+            Hacer Whitelist
+          </button>
+          <button onclick="navigateTo('normativas')" class="px-8 py-4 rounded-xl glass-card hover:border-brand-500 text-white font-extrabold text-sm sm:text-base transition-all duration-300 flex items-center gap-3 hover:-translate-y-1 hover:scale-105 active:scale-95">
+            <i class="fa-solid fa-book-open text-brand-400 text-lg"></i>
+            Ver Normativas
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN DE FACCIONES & ENTORNO -->
+    <section class="py-20 px-4 max-w-7xl mx-auto w-full relative z-10 border-t border-slate-800/80">
+      <div class="space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-3">
+            <button onclick="switchFeatureTab('facciones')" id="tab-btn-facciones" class="feature-tab-btn px-6 py-2.5 rounded-full text-xs font-extrabold transition-all bg-[#241c0c] text-[#facc15] border border-[#facc15]/50 shadow-[0_0_15px_rgba(250,204,21,0.2)]">
+              Facciones
+            </button>
+            <button onclick="switchFeatureTab('criminal')" id="tab-btn-criminal" class="feature-tab-btn px-6 py-2.5 rounded-full text-xs font-extrabold transition-all bg-[#121826] text-slate-300 border border-slate-800 hover:border-slate-600">
+              Rol criminal
+            </button>
+            <button onclick="switchFeatureTab('civil')" id="tab-btn-civil" class="feature-tab-btn px-6 py-2.5 rounded-full text-xs font-extrabold transition-all bg-[#121826] text-slate-300 border border-slate-800 hover:border-slate-600">
+              Rol civil
+            </button>
+            <button onclick="switchFeatureTab('coches')" id="tab-btn-coches" class="feature-tab-btn px-6 py-2.5 rounded-full text-xs font-extrabold transition-all bg-[#121826] text-slate-300 border border-slate-800 hover:border-slate-600">
+              Coches
+            </button>
+            <button onclick="switchFeatureTab('sistemas')" id="tab-btn-sistemas" class="feature-tab-btn px-6 py-2.5 rounded-full text-xs font-extrabold transition-all bg-[#121826] text-slate-300 border border-slate-800 hover:border-slate-600">
+              Sistemas
+            </button>
+          </div>
+
+          <div>
+            <button id="addFeatureImageBtn" onclick="openFeatureImageModal()" class="hidden px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs transition-all shadow-lg shadow-amber-600/30 items-center gap-2">
+              <i class="fa-solid fa-plus"></i> Añadir Imagen a esta Categoría
+            </button>
+          </div>
+        </div>
+
+        <div class="max-w-4xl">
+          <p id="featureDescriptionText" class="text-slate-300 text-sm sm:text-base leading-relaxed font-medium">
+            Policía, médicos, bomberos, gobierno, prensa, noticieros, restaurantes, mecánicos, concesionarios, ammunations, discotecas y mucho más: cada facción con sus propios sistemas inmersivos para vivir el rol como nunca.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+          <div class="lg:col-span-8 rounded-3xl overflow-hidden glass-card border border-slate-800 relative h-[360px] sm:h-[480px]">
+            <img id="mainFeatureDisplayImg" src="https://images.unsplash.com/photo-1555848962-6e79363ec58f?auto=format&fit=crop&w=1200&q=80" alt="Vista Principal" class="w-full h-full object-cover transition-all duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0b0e14]/80 via-transparent to-transparent"></div>
+            <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+              <span id="mainFeatureCaption" class="px-3 py-1 rounded-full bg-brand-500/20 border border-brand-500/40 text-brand-400 text-xs font-bold uppercase tracking-wider">
+                LSPD & Operativa Táctica
+              </span>
+            </div>
+          </div>
+
+          <div id="featureThumbnailsContainer" class="lg:col-span-4 grid grid-cols-2 gap-3 content-start max-h-[360px] sm:max-h-[480px] overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- VIEW 2: NORMATIVAS -->
+  <main id="view-normativas" class="page-view hidden-view flex-1 py-12 px-4 max-w-7xl mx-auto w-full relative z-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6 border-b border-slate-800 pb-8">
+      <div>
+        <div class="flex items-center gap-2 text-brand-500 font-black text-xs uppercase tracking-widest mb-2">
+          <i class="fa-solid fa-gavel text-sm"></i> Reglamento Oficial
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black text-white">Normativas del Servidor</h2>
+        <p class="text-slate-400 text-sm mt-2">El desconocimiento de estas reglas no exime de su cumplimiento.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="addRuleBtn" onclick="openRuleModal()" class="hidden px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm transition-all duration-300 shadow-lg shadow-emerald-600/30 items-center gap-2 hover:scale-105 active:scale-95">
+          <i class="fa-solid fa-plus"></i> Nueva Regla
+        </button>
+        <button id="resetRulesBtn" onclick="confirmResetRules()" class="hidden px-3.5 py-2.5 rounded-xl glass-card hover:border-red-500 text-slate-400 hover:text-red-400 font-bold text-xs transition-all duration-300 items-center gap-2 hover:scale-105 active:scale-95">
+          <i class="fa-solid fa-rotate-left"></i> Restablecer
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8">
+      <div class="lg:col-span-5 relative group">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-brand-500 transition-colors"></i>
+        <input 
+          type="text" 
+          id="rulesSearchInput" 
+          oninput="filterRules()" 
+          placeholder="Buscar norma por ID, título o palabras clave..." 
+          class="w-full pl-11 pr-4 py-3.5 rounded-xl glass-card text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm transition-all duration-300"
+        />
+      </div>
+
+      <div class="lg:col-span-7 flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
+        <button onclick="setCategoryFilter('ALL')" class="category-tab active px-4 py-3 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-brand-500 bg-brand-500 text-white shadow-lg shadow-brand-500/30 hover:scale-105">
+          Todas
+        </button>
+        <button onclick="setCategoryFilter('GENERAL')" class="category-tab px-4 py-3 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-brand-500/50 hover:scale-105">
+          General RP
+        </button>
+        <button onclick="setCategoryFilter('CONCEPTOS')" class="category-tab px-4 py-3 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-brand-500/50 hover:scale-105">
+          Conceptos Básicos
+        </button>
+        <button onclick="setCategoryFilter('ILEGAL')" class="category-tab px-4 py-3 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-brand-500/50 hover:scale-105">
+          Rol Criminal
+        </button>
+        <button onclick="setCategoryFilter('LEGAL')" class="category-tab px-4 py-3 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-brand-500/50 hover:scale-105">
+          LSPD & EMS
+        </button>
+      </div>
+    </div>
+
+    <div id="rulesContainer" class="space-y-4 min-h-[200px]"></div>
+    <div id="emptyRulesState" class="hidden text-center py-16 glass-card rounded-2xl border border-slate-800/80 my-8">
+      <i class="fa-solid fa-file-circle-xmark text-5xl text-slate-600 mb-4 animate-bounce"></i>
+      <h3 class="text-xl font-black text-slate-200">No se encontraron normativas</h3>
+    </div>
+  </main>
+
+  <!-- VIEW 3: WHITELIST -->
+  <main id="view-whitelist" class="page-view hidden-view flex-1 py-12 px-4 max-w-4xl mx-auto w-full relative z-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6 border-b border-slate-800 pb-8">
+      <div>
+        <div class="flex items-center gap-2 text-sky-400 font-black text-xs uppercase tracking-widest mb-2">
+          <i class="fa-solid fa-id-card text-sm"></i> Admisión Comunitaria
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black text-white">Formulario de Whitelist</h2>
+        <p class="text-slate-400 text-sm mt-2">Rellena el siguiente test de conceptos, la historia de tu personaje y los casos prácticos.</p>
+      </div>
+
+      <div id="staffWhitelistToolbar" class="hidden flex flex-wrap items-center gap-2">
+        <button onclick="openAddCategoryModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs transition-all duration-300 shadow-lg shadow-brand-600/30 flex items-center gap-2">
+          <i class="fa-solid fa-folder-plus"></i> Nueva Categoría
+        </button>
+        <button onclick="openAddQuestionModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all duration-300 shadow-lg shadow-emerald-600/30 flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle"></i> Añadir Pregunta
+        </button>
+        <button onclick="showWhitelistFormView()" id="btnReturnForm" class="hidden px-4 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-extrabold text-xs transition-all duration-300 shadow-lg flex items-center gap-2">
+          <i class="fa-solid fa-file-pen"></i> Volver al Formulario
+        </button>
+        <button onclick="showWhitelistManagerView()" id="btnViewApps" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs transition-all duration-300 shadow-lg shadow-sky-600/30 flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-list"></i> Ver Solicitudes (<span id="pendingAppsCount">0</span>)
+        </button>
+      </div>
+    </div>
+
+    <div id="whitelistFormWrapper">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="glass-card rounded-2xl p-4 border border-sky-500/20 flex items-center gap-3">
+          <div class="p-3 rounded-xl bg-sky-500/10 text-sky-400 text-lg"><i class="fa-solid fa-microphone"></i></div>
+          <div>
+            <h4 class="text-xs font-bold text-white uppercase">Micrófono Óptimo</h4>
+            <p class="text-[11px] text-slate-400">Sin ruido excesivo</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border border-sky-500/20 flex items-center gap-3">
+          <div class="p-3 rounded-xl bg-sky-500/10 text-sky-400 text-lg"><i class="fa-solid fa-user-check"></i></div>
+          <div>
+            <h4 class="text-xs font-bold text-white uppercase">Edad Mínima</h4>
+            <p class="text-[11px] text-slate-400">+16 Años recomendados</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border border-sky-500/20 flex items-center gap-3">
+          <div class="p-3 rounded-xl bg-sky-500/10 text-sky-400 text-lg"><i class="fa-solid fa-book-bookmark"></i></div>
+          <div>
+            <h4 class="text-xs font-bold text-white uppercase">Normativa</h4>
+            <p class="text-[11px] text-slate-400">Lectura previa obligatoria</p>
+          </div>
+        </div>
+      </div>
+
+      <form id="whitelistForm" onsubmit="handleWhitelistSubmit(event)" class="glass-card rounded-2xl border border-slate-800 p-6 sm:p-8 space-y-8">
+        <div>
+          <h3 class="text-lg font-black text-sky-400 mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-xs">1</span> Datos de Contacto
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Tu Nombre / Tag de Discord</label>
+              <input type="text" id="wlDiscord" required placeholder="Ej. usuario#1234 o username" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-sky-500 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Edad Real</label>
+              <input type="number" id="wlAge" required min="13" max="99" placeholder="Ej. 18" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-sky-500 text-sm" />
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-800/80 pt-6 space-y-4">
+          <h3 class="text-lg font-black text-sky-400 mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-xs">2</span> Ficha e Historia del Personaje (IC)
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Nombre y Apellido IC</label>
+              <input type="text" id="wlCharName" required placeholder="Ej. Jhonatan Pinto" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-sky-500 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Edad IC</label>
+              <input type="number" id="wlCharAge" required min="18" max="90" placeholder="Ej. 26" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-sky-500 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Lugar de Nacimiento</label>
+              <input type="text" id="wlCharBirth" required placeholder="Ej. Madrid, España" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-sky-500 text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Apariencia física, virtudes y defectos</label>
+            <textarea id="wlCharApp" rows="2" required placeholder="Rasgos distintivos, altura, tatuajes, personalidad..." class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-sky-500"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Historia de Trasfondo (Lore del Personaje - Mínimo 10 líneas recomendadas)</label>
+            <textarea id="wlCharLore" rows="5" required placeholder="¿De dónde viene? ¿Por qué ha llegado a la ciudad? ¿Cuáles son sus aspiraciones?" class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-sky-500"></textarea>
+          </div>
+        </div>
+
+        <div id="dynamicCategoriesContainer" class="space-y-8"></div>
+
+        <div class="pt-4 border-t border-slate-800 flex items-center justify-end">
+          <button type="submit" class="px-8 py-4 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-sm shadow-lg shadow-sky-500/30 hover:scale-105 active:scale-95 transition-all">
+            <i class="fa-solid fa-paper-plane mr-2"></i> Enviar Solicitud de Whitelist
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div id="whitelistAdminPanel" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 border border-sky-500/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-xl font-black text-white mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-sky-400"></i> Panel de Revisión de Whitelist (Staff)
+          </h3>
+          <p class="text-slate-400 text-xs">Aquí puedes revisar las solicitudes enviadas por los usuarios y administrar las categorías y preguntas adicionales.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openAddCategoryModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs transition-all flex items-center gap-2 justify-center">
+            <i class="fa-solid fa-folder-plus"></i> Nueva Categoría
+          </button>
+          <button onclick="openAddQuestionModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all flex items-center gap-2 justify-center">
+            <i class="fa-solid fa-plus-circle"></i> Añadir Pregunta
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 border border-slate-800">
+        <h4 class="text-sm font-black text-white mb-1">Solicitudes de Whitelist Recibidas</h4>
+      </div>
+
+      <div id="whitelistApplicationsContainer" class="space-y-4"></div>
+      
+      <div id="emptyWhitelistState" class="hidden text-center py-16 glass-card rounded-2xl border border-slate-800">
+        <i class="fa-solid fa-folder-open text-5xl text-slate-600 mb-4"></i>
+        <h3 class="text-xl font-black text-slate-300">No hay solicitudes de Whitelist pendientes</h3>
+      </div>
+    </div>
+  </main>
+
+  <!-- VIEW 4: NOTAS DE PARCHE -->
+  <main id="view-notas-de-parche" class="page-view hidden-view flex-1 py-12 px-4 max-w-7xl mx-auto w-full relative z-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6 border-b border-slate-800 pb-8">
+      <div>
+        <div class="flex items-center gap-2 text-emerald-400 font-black text-xs uppercase tracking-widest mb-2">
+          <i class="fa-solid fa-code-commit text-sm"></i> Changelog Oficial
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black text-white">Notas de Parche</h2>
+        <p class="text-slate-400 text-sm mt-2">Página independiente de cambios, mejoras de rendimiento y correcciones de OMERTA RP.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="addPatchBtn" onclick="openPatchModal()" class="hidden px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm transition-all duration-300 shadow-lg shadow-emerald-600/30 items-center gap-2 hover:scale-105 active:scale-95">
+          <i class="fa-solid fa-circle-plus"></i> Publicar Notas de Parche
+        </button>
+        <button id="resetPatchesBtn" onclick="confirmResetPatches()" class="hidden px-3.5 py-2.5 rounded-xl glass-card hover:border-red-500 text-slate-400 hover:text-red-400 font-bold text-xs transition-all duration-300 items-center gap-2 hover:scale-105 active:scale-95">
+          <i class="fa-solid fa-rotate-left"></i> Restablecer Parches
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 overflow-x-auto pb-6 scrollbar-none" id="patchCategoryTabs">
+      <button onclick="setPatchCategoryFilter('ALL')" class="patch-tab active px-4 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:scale-105">
+        Todos los Parches
+      </button>
+      <button onclick="setPatchCategoryFilter('Major Update')" class="patch-tab px-4 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-emerald-500/50 hover:scale-105">
+        Grandes Actualizaciones
+      </button>
+      <button onclick="setPatchCategoryFilter('Hotfix')" class="patch-tab px-4 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-emerald-500/50 hover:scale-105">
+        Hotfixes & Parches
+      </button>
+      <button onclick="setPatchCategoryFilter('LSPD / EMS')" class="patch-tab px-4 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-300 border border-slate-800 glass-card text-slate-400 hover:text-white hover:border-emerald-500/50 hover:scale-105">
+        Facciones Legales
+      </button>
+    </div>
+
+    <div id="patchesContainer" class="space-y-8 relative before:content-[''] before:absolute before:left-4 sm:before:left-8 before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-800"></div>
+
+    <div id="emptyPatchesState" class="hidden text-center py-16 glass-card rounded-2xl border border-slate-800/80 my-8">
+      <i class="fa-solid fa-code-merge text-5xl text-slate-600 mb-4 animate-bounce"></i>
+      <h3 class="text-xl font-black text-slate-200">No hay notas de parche registradas en esta categoría</h3>
+    </div>
+  </main>
+
+  <!-- MODAL PARA AÑADIR IMAGEN A FACCIONES/ENTORNO -->
+  <div id="featureImageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
+    <div class="glass-card rounded-2xl border border-amber-500/40 max-w-md w-full p-6 sm:p-8 shadow-2xl relative my-8">
+      <button onclick="closeFeatureImageModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+          <i class="fa-solid fa-image text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl font-black text-white">Añadir Imagen a Pestaña</h3>
+          <p class="text-slate-400 text-xs">Sube una nueva tarjeta a la categoría actual.</p>
+        </div>
+      </div>
+
+      <form onsubmit="saveFeatureImage(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Título / Etiqueta</label>
+          <input type="text" id="featureImgTitleInput" required placeholder="Ej. Nueva Operativa" class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-amber-500 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">URL de la Imagen</label>
+          <input type="url" id="featureImgUrlInput" required placeholder="https://images.unsplash.com/..." class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-amber-500 text-sm" />
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeFeatureImageModal()" class="px-5 py-2.5 rounded-xl glass-card text-slate-300 font-bold text-sm">Cancelar</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-sm shadow-lg shadow-amber-600/30">Guardar Imagen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE ACCESO ADMIN -->
+  <div id="adminPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 transition-all duration-300 opacity-0 scale-95">
+    <div class="glass-card rounded-2xl border border-brand-500/40 max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+      <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-500 flex items-center justify-center mx-auto text-2xl mb-4 animate-bounce">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="text-2xl font-black text-white">Acceso Modo Staff</h3>
+        <p class="text-slate-400 text-xs mt-1">Ingresa la clave administrativa (Clave Demo: <span class="text-brand-500 font-bold">admin123</span>)</p>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-2">Contraseña de Staff</label>
+          <input type="password" id="adminPasswordInput" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
+        </div>
+        <div id="adminLoginError" class="text-red-400 text-xs hidden font-bold flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation"></i> Contraseña incorrecta.
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm transition-all shadow-lg shadow-brand-500/30 hover:scale-[1.02] active:scale-95">
+          Iniciar Sesión
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CATEGORÍA -->
+  <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
+    <div class="glass-card rounded-2xl border border-brand-500/40 max-w-md w-full p-6 sm:p-8 shadow-2xl relative my-8">
+      <button onclick="closeCategoryModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-500">
+          <i class="fa-solid fa-folder-tree text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl font-black text-white" id="categoryModalTitle">Nueva Categoría</h3>
+          <p class="text-slate-400 text-xs">Crea o edita una sección del formulario.</p>
+        </div>
+      </div>
+
+      <form onsubmit="saveCategory(event)" class="space-y-4">
+        <input type="hidden" id="categoryEditId" value="" />
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Nombre de la Categoría</label>
+          <input type="text" id="categoryNameInput" required placeholder="Ej. Test de Normativa Avanzada" class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeCategoryModal()" class="px-5 py-2.5 rounded-xl glass-card text-slate-300 font-bold text-sm">Cancelar</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm shadow-lg shadow-brand-500/30">Guardar Categoría</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL PREGUNTA -->
+  <div id="addQuestionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
+    <div class="glass-card rounded-2xl border border-emerald-500/40 max-w-lg w-full p-6 sm:p-8 shadow-2xl relative my-8">
+      <button onclick="closeAddQuestionModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+          <i class="fa-solid fa-circle-question text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl font-black text-white" id="questionModalTitle">Añadir Pregunta a Whitelist</h3>
+          <p class="text-slate-400 text-xs">Configura los detalles y el tipo de campo.</p>
+        </div>
+      </div>
+
+      <form onsubmit="saveQuestion(event)" class="space-y-4">
+        <input type="hidden" id="questionEditId" value="" />
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Categoría / Sección de Destino</label>
+          <select id="questionCategorySelect" required class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-emerald-500 text-sm bg-slate-900"></select>
+        </div>
+        
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Tipo de Campo de Respuesta</label>
+          <select id="questionTypeSelect" required class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-emerald-500 text-sm bg-slate-900">
+            <option value="textarea">Área de texto largo (Ideal para desarrollo/loren/casos)</option>
+            <option value="input">Respuesta corta (Ideal para definiciones breves o una línea)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Enunciado de la Pregunta</label>
+          <textarea id="questionTextInput" rows="2" required placeholder="Ej. ¿Qué harías si..." class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-emerald-500"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Texto de Ayuda (Placeholder)</label>
+          <input type="text" id="questionPlaceholderInput" required placeholder="Ej. Explica tu procedimiento..." class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-emerald-500 text-sm" />
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeAddQuestionModal()" class="px-5 py-2.5 rounded-xl glass-card text-slate-300 font-bold text-sm">Cancelar</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/30">Guardar Pregunta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL REGLA -->
+  <div id="ruleFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
+    <div class="glass-card rounded-2xl border border-brand-500/40 max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
+      <button onclick="closeRuleModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-500">
+          <i class="fa-solid fa-pen-to-square text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl font-black text-white" id="modalFormTitle">Agregar Nueva Normativa</h3>
+        </div>
+      </div>
+
+      <form onsubmit="saveRule(event)" class="space-y-4">
+        <input type="hidden" id="ruleEditId" value="" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Código de Regla</label>
+            <input type="text" id="ruleCodeInput" required placeholder="Ej. REG-1.0" class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Categoría</label>
+            <select id="ruleCategoryInput" required class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm bg-slate-900">
+              <option value="GENERAL">General RP</option>
+              <option value="CONCEPTOS">Conceptos Básicos</option>
+              <option value="ILEGAL">Rol Criminal</option>
+              <option value="LEGAL">LSPD & EMS</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Título</label>
+            <input type="text" id="ruleTitleInput" required placeholder="Ej. Powergaming (PG)" class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Sanción</label>
+            <select id="rulePenaltyInput" required class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-brand-500 text-sm bg-slate-900">
+              <option value="Advertencia">Advertencia Verbal</option>
+              <option value="Jail 30m">Jail Administrativo (30m)</option>
+              <option value="Ban 1 Día">Ban Temporal (1 Día)</option>
+              <option value="Ban 3 Días">Ban Temporal (3 Días)</option>
+              <option value="Ban Permanente">Ban Permanente</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Resumen</label>
+          <input type="text" id="ruleSummaryInput" required class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Descripción Detallada</label>
+          <textarea id="ruleDescriptionInput" rows="4" required class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeRuleModal()" class="px-5 py-2.5 rounded-xl glass-card text-slate-300 font-bold text-sm">Cancelar</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL PARCHE -->
+  <div id="patchFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4 overflow-y-auto transition-all duration-300 opacity-0 scale-95">
+    <div class="glass-card rounded-2xl border border-emerald-500/40 max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
+      <button onclick="closePatchModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+          <i class="fa-solid fa-code-commit text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl font-black text-white" id="patchModalTitle">Publicar Notas de Parche</h3>
+          <p class="text-slate-400 text-xs">Añade los detalles del parche para notificar a la comunidad.</p>
+        </div>
+      </div>
+
+      <form onsubmit="savePatch(event)" class="space-y-4">
+        <input type="hidden" id="patchEditId" value="" />
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Versión</label>
+            <input type="text" id="patchVersionInput" required placeholder="Ej. v2.5.0" class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-emerald-500 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Fecha de Lanzamiento</label>
+            <input type="text" id="patchDateInput" required placeholder="Ej. 18 de Sep, 2026" class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-emerald-500 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Categoría</label>
+            <select id="patchCategoryInput" required class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-emerald-500 text-sm bg-slate-900">
+              <option value="Major Update">Major Update</option>
+              <option value="Hotfix">Hotfix</option>
+              <option value="LSPD / EMS">LSPD / EMS</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Título del Parche</label>
+          <input type="text" id="patchTitleInput" required placeholder="Ej. Actualización de Economía & Concesionarios" class="w-full px-4 py-2.5 rounded-xl glass-card text-white focus:outline-none focus:border-emerald-500 text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Novedades Añadidas [+] (Una por línea)</label>
+          <textarea id="patchAddedInput" rows="3" placeholder="Sistemas creados o funciones implementadas..." class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-emerald-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Cambios / Ajustes [*] (Una por línea)</label>
+          <textarea id="patchChangedInput" rows="3" placeholder="Modificaciones o rebalanceos..." class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-emerald-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-300 uppercase mb-1.5">Bugs Corregidos [-] (Una por línea)</label>
+          <textarea id="patchFixedInput" rows="3" placeholder="Correcciones de errores o exploits..." class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-emerald-500"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closePatchModal()" class="px-5 py-2.5 rounded-xl glass-card text-slate-300 font-bold text-sm">Cancelar</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/30">Guardar Parche</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+  <footer class="border-t border-slate-800/80 bg-slate-950/90 backdrop-blur-md py-10 px-4 mt-auto relative z-10">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <span class="font-extrabold text-slate-300">OMERTA Roleplay</span> &copy; 2026. Todos los derechos reservados.
+      </div>
+      <p>No afiliado ni respaldado por Rockstar Games ni Take-Two Interactive.</p>
+    </div>
+  </footer>
+
+  <script>
+    const DEFAULT_RULES = [
+      {
+        id: "rule-1",
+        code: "GEN-01",
+        category: "CONCEPTOS",
+        title: "Valorar la Vida (NVHQ)",
+        penalty: "Ban 3 Días",
+        summary: "Debes actuar en todo momento priorizando la supervivencia física e integridad de tu personaje.",
+        description: "Tu personaje debe temer por su vida en situaciones donde esté encañonado o supere en número de armas. Ejemplo: Si una persona te encañona por la espalda a corta distancia, no puedes sacar un arma ni huir corriendo."
+      },
+      {
+        id: "rule-2",
+        code: "GEN-02",
+        category: "CONCEPTOS",
+        title: "Powergaming (PG)",
+        penalty: "Jail 30m",
+        summary: "Realizar acciones dentro del juego que no serían posibles en la vida real o forzar el rol de otros.",
+        description: "Incluye conducir vehículos deportivos por montañas escarpadas a gran velocidad, andar normalmente tras sufrir un accidente grave sin rol de mecatrónica/heridas, o usar comandos para obligar a otro jugador sin opción de defensa."
+      },
+      {
+        id: "rule-3",
+        code: "GEN-03",
+        category: "CONCEPTOS",
+        title: "Metagaming (MG)",
+        penalty: "Ban 1 Día",
+        summary: "Utilizar información obtenida fuera del juego (OOC) para beneficio de tu personaje dentro del juego (IC).",
+        description: "Queda estrictamente prohibido usar datos leídos en Discord, transmisiones de Twitch o chats externos para localizar jugadores, conocer identidades secretas o ejecutar venganzas en el servidor."
+      }
+    ];
+
+    const DEFAULT_FEATURE_DATA = {
+      facciones: {
+        description: "Policía, médicos, bomberos, gobierno, prensa, noticieros, restaurantes, mecánicos, concesionarios, ammunations, discotecas y mucho más: cada facción con sus propios sistemas inmersivos para vivir el rol como nunca.",
+        items: [
+          { id: 'item-1', title: "LSPD & Operativa Táctica", img: "https://images.unsplash.com/photo-1555848962-6e79363ec58f?auto=format&fit=crop&w=1200&q=80" },
+          { id: 'item-2', title: "Servicios de Emergencia (EMS)", img: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80" },
+          { id: 'item-3', title: "Gobierno & Alcaldía", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80" }
+        ]
+      },
+      criminal: {
+        description: "Bandas organizadas, mafias, laboratorios ocultos de sustancias ilícitas, atrevidos robos a bancos con planificación y control territorial de zonas conflictivas.",
+        items: [
+          { id: 'item-4', title: "Control Territorial & Bandas", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80" },
+          { id: 'item-5', title: "Laboratorios Clandestinos", img: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" }
+        ]
+      },
+      civil: {
+        description: "Desarrolla tu vida legal desde cero: consigue empleo de camionero, minero o pescador, compra tu propia casa, invierte en negocios y asciende en la sociedad.",
+        items: [
+          { id: 'item-6', title: "Trabajos Civiles Dinámicos", img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80" },
+          { id: 'item-7', title: "Bienes Raíces & Viviendas", img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80" }
+        ]
+      },
+      coches: {
+        description: "Más de 200 vehículos importados exclusivos, manejo realista optimizado, sistema de tuning avanzado con piezas estéticas y mecánicas personalizables.",
+        items: [
+          { id: 'item-8', title: "Concesionario de Importación", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80" },
+          { id: 'item-9', title: "Tuning & Personalización", img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80" }
+        ]
+      },
+      sistemas: {
+        description: "Optimización extrema a 60+ FPS, chat de voz 3D espacial con radio y teléfono móvil interactivo con aplicaciones bancarias, GPS y redes sociales.",
+        items: [
+          { id: 'item-10', title: "Teléfono Móvil Avanzado", img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80" },
+          { id: 'item-11', title: "Radio & Voz Espacial 3D", img: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80" }
+        ]
+      }
+    };
+
+    const DEFAULT_PATCHES = [
+      {
+        id: "patch-1",
+        version: "v2.5.0",
+        date: "18 de Sep, 2026",
+        category: "Major Update",
+        title: "Actualización de Sistema Legal & Vehículos Importados",
+        added: [
+          "Nuevo MDIC Policial v3.0 con reconocimiento de matrículas automatizado.",
+          "Concesionario de Importación exclusivo con 15 vehículos deportivos custom.",
+          "Minijuego de Mecánica Avanzada para sintonización de motores."
+        ],
+        changed: [
+          "Rebalanceo de precios de combustible en todas las gasolineras.",
+          "Aumento de la velocidad de respuesta de las llamadas del 911."
+        ],
+        fixed: [
+          "Corregido error de duplicación de objetos en inventarios de maletero.",
+          "Solucionado desfase de sincronización en puertas de la Comisaría Central."
+        ]
+      }
+    ];
+
+    const DEFAULT_CATEGORIES = [
+      { id: 'cat-conceptos', name: '3. Conocimientos Basicos De Rol' },
+      { id: 'cat-casos', name: '4. Resolución de Casos Prácticos' }
+    ];
+
+    const DEFAULT_QUESTIONS = [
+      { id: 'q-1', categoryId: 'cat-conceptos', type: 'textarea', text: '¿Qué es el Rol de Entorno (RE) y cómo debe aplicarse?', placeholder: 'Explícalo brevemente...' },
+      { id: 'q-2', categoryId: 'cat-conceptos', type: 'textarea', text: '¿Cuál es la diferencia principal entre IC y OOC?', placeholder: 'Explícalo brevemente...' },
+      { id: 'q-3', categoryId: 'cat-conceptos', type: 'textarea', text: 'Define Metagaming (MG) y pon un ejemplo de lo que no se debe hacer.', placeholder: 'Explícalo con un ejemplo...' },
+      { id: 'q-4', categoryId: 'cat-conceptos', type: 'textarea', text: 'Define Powergaming (PG) y pon un ejemplo.', placeholder: 'Explícalo con un ejemplo...' },
+      { id: 'q-5', categoryId: 'cat-conceptos', type: 'textarea', text: '¿Qué significa "Valor de la Vida" (NVL)?', placeholder: 'Explícalo brevemente...' },
+      { id: 'q-6', categoryId: 'cat-casos', type: 'textarea', text: 'Situación 1: Vas caminando por una zona conflictiva y unos enmascarados te interceptan con armas de fuego para robarte sin vía de escape. ¿Cómo reaccionas?', placeholder: 'Describe la reacción de tu personaje...' },
+      { id: 'q-7', categoryId: 'cat-casos', type: 'textarea', text: 'Situación 2: Sufres un aparatoso accidente automovilístico frontal a gran velocidad contra un poste. ¿Cuál es tu reacción inmediata de rol?', placeholder: 'Describe cómo interpretas las heridas y el entorno...' }
+    ];
+
+    let rulesData = [];
+    let featureData = {};
+    let patchesData = [];
+    let whitelistAppsData = [];
+    let whitelistCategories = [];
+    let whitelistQuestions = [];
+    let currentCategory = 'ALL';
+    let currentFeatureTab = 'facciones';
+    let currentPatchCategory = 'ALL';
+    let isAdminLoggedIn = false;
+
+    function navigateTo(route) {
+      const views = ['inicio', 'normativas', 'whitelist', 'notas-de-parche'];
+      const targetRoute = views.includes(route) ? route : 'inicio';
+
+      window.location.hash = targetRoute;
+
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const navEl = document.getElementById(`nav-${v}`);
+        
+        if (v === targetRoute) {
+          el.classList.remove('hidden-view');
+          el.classList.add('active-view');
+          if (navEl) {
+            navEl.classList.add('text-brand-500', 'font-black');
+            navEl.classList.remove('text-slate-300');
+          }
+        } else {
+          el.classList.add('hidden-view');
+          el.classList.remove('active-view');
+          if (navEl) {
+            navEl.classList.remove('text-brand-500', 'font-black');
+            navEl.classList.add('text-slate-300');
+          }
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      navigateTo(hash);
+    });
+
+    function initParticleCanvas() {
+      const canvas = document.getElementById('particleCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      const particles = [];
+      const particleCount = Math.min(Math.floor(width / 20), 60);
+      let mouse = { x: width / 2, y: height / 2 };
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      class Particle {
+        constructor() { this.reset(); }
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2 + 1;
+          this.speedX = (Math.random() - 0.5) * 0.4;
+          this.speedY = (Math.random() - 0.5) * 0.4;
+          this.alpha = Math.random() * 0.5 + 0.2;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x < 0 || this.x > width) this.speedX *= -1;
+          if (this.y < 0 || this.y > height) this.speedY *= -1;
+
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            this.x -= (dx / dist) * 0.8;
+            this.y -= (dy / dist) * 0.8;
+          }
+        }
+        draw() {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(48, 169, 255, ${this.alpha})`;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = '#30a9ff';
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 130) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(48, 169, 255, ${0.15 * (1 - dist / 130)})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initParticleCanvas();
+      loadData();
+      switchFeatureTab('facciones');
+      renderRules();
+      renderPatches();
+      renderWhitelistFormBuilder();
+      updateWhitelistBadge();
+
+      const initialHash = window.location.hash.replace('#', '');
+      navigateTo(initialHash || 'inicio');
+    });
+
+    function loadData() {
+      const storedRules = localStorage.getItem('omerta_rp_rules');
+      rulesData = storedRules ? JSON.parse(storedRules) : [...DEFAULT_RULES];
+
+      const storedFeatures = localStorage.getItem('omerta_rp_feature_data');
+      featureData = storedFeatures ? JSON.parse(storedFeatures) : JSON.parse(JSON.stringify(DEFAULT_FEATURE_DATA));
+
+      const storedPatches = localStorage.getItem('omerta_rp_patches');
+      patchesData = storedPatches ? JSON.parse(storedPatches) : [...DEFAULT_PATCHES];
+
+      const storedWl = localStorage.getItem('omerta_rp_whitelist_apps');
+      whitelistAppsData = storedWl ? JSON.parse(storedWl) : [];
+
+      const storedCats = localStorage.getItem('omerta_rp_whitelist_categories');
+      whitelistCategories = storedCats ? JSON.parse(storedCats) : [...DEFAULT_CATEGORIES];
+
+      const storedQ = localStorage.getItem('omerta_rp_whitelist_questions');
+      whitelistQuestions = storedQ ? JSON.parse(storedQ) : [...DEFAULT_QUESTIONS];
+    }
+
+    function saveData() {
+      localStorage.setItem('omerta_rp_rules', JSON.stringify(rulesData));
+      localStorage.setItem('omerta_rp_feature_data', JSON.stringify(featureData));
+      localStorage.setItem('omerta_rp_patches', JSON.stringify(patchesData));
+      localStorage.setItem('omerta_rp_whitelist_apps', JSON.stringify(whitelistAppsData));
+      localStorage.setItem('omerta_rp_whitelist_categories', JSON.stringify(whitelistCategories));
+      localStorage.setItem('omerta_rp_whitelist_questions', JSON.stringify(whitelistQuestions));
+    }
+
+    function switchFeatureTab(tabKey) {
+      currentFeatureTab = tabKey;
+      const data = featureData[tabKey];
+      if (!data) return;
+
+      document.querySelectorAll('.feature-tab-btn').forEach(btn => {
+        btn.className = "feature-tab-btn px-6 py-2.5 rounded-full text-xs font-extrabold transition-all bg-[#121826] text-slate-300 border border-slate-800 hover:border-slate-600";
+      });
+
+      const activeBtn = document.getElementById(`tab-btn-${tabKey}`);
+      if (activeBtn) {
+        activeBtn.className = "feature-tab-btn px-6 py-2.5 rounded-full text-xs font-extrabold transition-all bg-[#241c0c] text-[#facc15] border border-[#facc15]/50 shadow-[0_0_15px_rgba(250,204,21,0.2)]";
+      }
+
+      document.getElementById('featureDescriptionText').textContent = data.description;
+      renderThumbnails(data.items);
+    }
+
+    function renderThumbnails(items) {
+      const thumbsContainer = document.getElementById('featureThumbnailsContainer');
+      thumbsContainer.innerHTML = '';
+
+      if (!items || items.length === 0) {
+        thumbsContainer.innerHTML = '<div class="col-span-2 text-xs text-slate-500 italic p-4">No hay imágenes en esta categoría. Usa el botón de Staff para añadir una.</div>';
+        document.getElementById('mainFeatureDisplayImg').src = "https://images.unsplash.com/photo-1555848962-6e79363ec58f?auto=format&fit=crop&w=1200&q=80";
+        document.getElementById('mainFeatureCaption').textContent = "Sin imágenes";
+        return;
+      }
+
+      items.forEach((item, index) => {
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = `rounded-2xl overflow-hidden glass-card border cursor-pointer transition-all h-24 relative group ${index === 0 ? 'border-[#facc15] shadow-[0_0_10px_rgba(250,204,21,0.3)]' : 'border-slate-800 hover:border-slate-600'}`;
+        
+        thumbDiv.onclick = () => {
+          document.getElementById('mainFeatureDisplayImg').src = item.img;
+          document.getElementById('mainFeatureCaption').textContent = item.title;
+          
+          thumbsContainer.querySelectorAll('div').forEach(d => {
+            d.className = "rounded-2xl overflow-hidden glass-card border cursor-pointer transition-all h-24 relative group border-slate-800 hover:border-slate-600";
+          });
+          thumbDiv.className = "rounded-2xl overflow-hidden glass-card border cursor-pointer transition-all h-24 relative group border-[#facc15] shadow-[0_0_10px_rgba(250,204,21,0.3)]";
+        };
+
+        let deleteBtnHTML = '';
+        if (isAdminLoggedIn) {
+          deleteBtnHTML = `
+            <button onclick="event.stopPropagation(); deleteFeatureImage('${item.id}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-600/80 text-white hover:bg-red-600 flex items-center justify-center text-[10px] z-20 shadow" title="Eliminar imagen">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          `;
         }
 
-        function cerrarSesion() {
-            document.getElementById('admin-panel').style.display = 'none';
-            document.getElementById('login-container').style.display = 'block';
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
+        thumbDiv.innerHTML = `
+          ${deleteBtnHTML}
+          <img src="${escapeHTML(item.img)}" alt="${escapeHTML(item.title)}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+          <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors"></div>
+          <div class="absolute bottom-1 left-2 right-2 text-[10px] font-bold text-white truncate drop-shadow">${escapeHTML(item.title)}</div>
+        `;
+        thumbsContainer.appendChild(thumbDiv);
+      });
+
+      if (items.length > 0) {
+        document.getElementById('mainFeatureDisplayImg').src = items[0].img;
+        document.getElementById('mainFeatureCaption').textContent = items[0].title;
+      }
+    }
+
+    function openFeatureImageModal() {
+      if (!isAdminLoggedIn) return;
+      const modal = document.getElementById('featureImageModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('featureImgTitleInput').value = "";
+      document.getElementById('featureImgUrlInput').value = "";
+    }
+
+    function closeFeatureImageModal() {
+      const modal = document.getElementById('featureImageModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function saveFeatureImage(e) {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const title = document.getElementById('featureImgTitleInput').value.trim();
+      const img = document.getElementById('featureImgUrlInput').value.trim();
+
+      if (!featureData[currentFeatureTab]) {
+        featureData[currentFeatureTab] = { description: "", items: [] };
+      }
+
+      const newItem = {
+        id: 'item-' + Date.now(),
+        title,
+        img
+      };
+
+      featureData[currentFeatureTab].items.push(newItem);
+      saveData();
+      switchFeatureTab(currentFeatureTab);
+      closeFeatureImageModal();
+      showToast("Imagen añadida con éxito", "success");
+    }
+
+    function deleteFeatureImage(itemId) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Estás seguro de eliminar esta imagen?")) {
+        if (featureData[currentFeatureTab] && featureData[currentFeatureTab].items) {
+          featureData[currentFeatureTab].items = featureData[currentFeatureTab].items.filter(i => i.id !== itemId);
+          saveData();
+          switchFeatureTab(currentFeatureTab);
+          showToast("Imagen eliminada", "info");
         }
-    </script>
+      }
+    }
+
+    function renderWhitelistFormBuilder() {
+      const container = document.getElementById('dynamicCategoriesContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      whitelistCategories.forEach((cat, catIdx) => {
+        const catSection = document.createElement('div');
+        catSection.className = "border-t border-slate-800/80 pt-6 space-y-4";
+
+        let catHeaderControls = '';
+        if (isAdminLoggedIn) {
+          catHeaderControls = `
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="openEditCategoryModal('${cat.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all" title="Editar Categoría">
+                <i class="fa-solid fa-pen"></i> Editar
+              </button>
+              <button type="button" onclick="deleteCategory('${cat.id}')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all" title="Eliminar Categoría">
+                <i class="fa-solid fa-trash"></i> Borrar
+              </button>
+            </div>
+          `;
+        }
+
+        catSection.innerHTML = `
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="text-lg font-black text-sky-400 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-xs">${catIdx + 3}</span> ${escapeHTML(cat.name)}
+            </h3>
+            ${catHeaderControls}
+          </div>
+          <div id="questions-cat-${cat.id}" class="space-y-4"></div>
+        `;
+        container.appendChild(catSection);
+
+        const qContainer = catSection.querySelector(`#questions-cat-${cat.id}`);
+        const catQuestions = whitelistQuestions.filter(q => q.categoryId === cat.id);
+
+        catQuestions.forEach((q, qIdx) => {
+          const qDiv = document.createElement('div');
+          qDiv.className = "space-y-1 bg-slate-950/30 p-4 rounded-xl border border-slate-800/60";
+
+          let qControls = '';
+          if (isAdminLoggedIn) {
+            qControls = `
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="openEditQuestionModal('${q.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all" title="Editar Pregunta">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button type="button" onclick="deleteQuestion('${q.id}')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all" title="Eliminar Pregunta">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            `;
+          }
+
+          const fieldHTML = q.type === 'input' 
+            ? `<input type="text" id="wlQ_${q.id}" required placeholder="${escapeHTML(q.placeholder)}" class="w-full px-4 py-3 rounded-xl glass-card text-white text-sm focus:outline-none focus:border-sky-500" />`
+            : `<textarea id="wlQ_${q.id}" rows="2" required placeholder="${escapeHTML(q.placeholder)}" class="w-full px-4 py-2.5 rounded-xl glass-card text-white text-sm focus:border-sky-500"></textarea>`;
+
+          qDiv.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <label class="block text-xs font-bold text-slate-300">${qIdx + 1}. ${escapeHTML(q.text)}</label>
+              ${qControls}
+            </div>
+            ${fieldHTML}
+          `;
+          qContainer.appendChild(qDiv);
+        });
+      });
+    }
+
+    function openAddCategoryModal() {
+      if (!isAdminLoggedIn) return;
+      const modal = document.getElementById('categoryModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('categoryModalTitle').textContent = "Nueva Categoría";
+      document.getElementById('categoryEditId').value = "";
+      document.getElementById('categoryNameInput').value = "";
+    }
+
+    function openEditCategoryModal(catId) {
+      if (!isAdminLoggedIn) return;
+      const cat = whitelistCategories.find(c => c.id === catId);
+      if (!cat) return;
+
+      const modal = document.getElementById('categoryModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('categoryModalTitle').textContent = "Editar Categoría";
+      document.getElementById('categoryEditId').value = cat.id;
+      document.getElementById('categoryNameInput').value = cat.name;
+    }
+
+    function closeCategoryModal() {
+      const modal = document.getElementById('categoryModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function saveCategory(e) {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const editId = document.getElementById('categoryEditId').value;
+      const name = document.getElementById('categoryNameInput').value.trim();
+
+      if (editId) {
+        const cat = whitelistCategories.find(c => c.id === editId);
+        if (cat) {
+          cat.name = name;
+          showToast("Categoría actualizada con éxito", "success");
+        }
+      } else {
+        const newCat = {
+          id: 'cat-' + Date.now(),
+          name
+        };
+        whitelistCategories.push(newCat);
+        showToast("Categoría creada con éxito", "success");
+      }
+
+      saveData();
+      renderWhitelistFormBuilder();
+      closeCategoryModal();
+    }
+
+    function deleteCategory(catId) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Estás seguro de eliminar esta categoría y todas las preguntas que contiene?")) {
+        whitelistCategories = whitelistCategories.filter(c => c.id !== catId);
+        whitelistQuestions = whitelistQuestions.filter(q => q.categoryId !== catId);
+        saveData();
+        renderWhitelistFormBuilder();
+        showToast("Categoría eliminada", "info");
+      }
+    }
+
+    function openAddQuestionModal() {
+      if (!isAdminLoggedIn) return;
+      if (whitelistCategories.length === 0) {
+        alert("Primero debes crear al menos una categoría.");
+        return;
+      }
+
+      const modal = document.getElementById('addQuestionModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('questionModalTitle').textContent = "Añadir Pregunta a Whitelist";
+      document.getElementById('questionEditId').value = "";
+      document.getElementById('questionTextInput').value = "";
+      document.getElementById('questionPlaceholderInput').value = "";
+      document.getElementById('questionTypeSelect').value = "textarea";
+
+      populateCategorySelect();
+    }
+
+    function openEditQuestionModal(qId) {
+      if (!isAdminLoggedIn) return;
+      const q = whitelistQuestions.find(item => item.id === qId);
+      if (!q) return;
+
+      const modal = document.getElementById('addQuestionModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('questionModalTitle').textContent = "Editar Pregunta";
+      document.getElementById('questionEditId').value = q.id;
+      document.getElementById('questionTextInput').value = q.text;
+      document.getElementById('questionPlaceholderInput').value = q.placeholder;
+      document.getElementById('questionTypeSelect').value = q.type || 'textarea';
+
+      populateCategorySelect(q.categoryId);
+    }
+
+    function populateCategorySelect(selectedId = '') {
+      const select = document.getElementById('questionCategorySelect');
+      select.innerHTML = '';
+      whitelistCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.textContent = cat.name;
+        if (cat.id === selectedId) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function closeAddQuestionModal() {
+      const modal = document.getElementById('addQuestionModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function saveQuestion(e) {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const editId = document.getElementById('questionEditId').value;
+      const categoryId = document.getElementById('questionCategorySelect').value;
+      const type = document.getElementById('questionTypeSelect').value;
+      const text = document.getElementById('questionTextInput').value.trim();
+      const placeholder = document.getElementById('questionPlaceholderInput').value.trim();
+
+      if (editId) {
+        const q = whitelistQuestions.find(item => item.id === editId);
+        if (q) {
+          q.categoryId = categoryId;
+          q.type = type;
+          q.text = text;
+          q.placeholder = placeholder;
+          showToast("Pregunta actualizada con éxito", "success");
+        }
+      } else {
+        const newQ = {
+          id: 'q-' + Date.now(),
+          categoryId,
+          type,
+          text,
+          placeholder
+        };
+        whitelistQuestions.push(newQ);
+        showToast("Pregunta añadida con éxito", "success");
+      }
+
+      saveData();
+      renderWhitelistFormBuilder();
+      closeAddQuestionModal();
+    }
+
+    function deleteQuestion(qId) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Estás seguro de eliminar esta pregunta del formulario?")) {
+        whitelistQuestions = whitelistQuestions.filter(q => q.id !== qId);
+        saveData();
+        renderWhitelistFormBuilder();
+        showToast("Pregunta eliminada", "info");
+      }
+    }
+
+    function handleWhitelistSubmit(e) {
+      e.preventDefault();
+
+      const customAnswers = {};
+      whitelistQuestions.forEach(q => {
+        const field = document.getElementById(`wlQ_${q.id}`);
+        if (field) {
+          customAnswers[q.text] = field.value.trim();
+        }
+      });
+
+      const appData = {
+        id: 'wl-' + Date.now(),
+        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        discord: document.getElementById('wlDiscord').value.trim(),
+        age: document.getElementById('wlAge').value.trim(),
+        charName: document.getElementById('wlCharName').value.trim(),
+        charAge: document.getElementById('wlCharAge').value.trim(),
+        charBirth: document.getElementById('wlCharBirth').value.trim(),
+        charApp: document.getElementById('wlCharApp').value.trim(),
+        charLore: document.getElementById('wlCharLore').value.trim(),
+        customAnswers: customAnswers,
+        status: 'Pendiente'
+      };
+
+      whitelistAppsData.unshift(appData);
+      saveData();
+      updateWhitelistBadge();
+
+      showToast("¡Solicitud de Whitelist enviada con éxito!", "success");
+
+      const formEl = document.getElementById('whitelistForm');
+      if (formEl) {
+        formEl.reset();
+      }
+    }
+
+    function updateWhitelistBadge() {
+      const pending = whitelistAppsData.filter(a => a.status === 'Pendiente').length;
+      document.getElementById('pendingAppsCount').textContent = pending;
+    }
+
+    function showWhitelistManagerView() {
+      const formWrapper = document.getElementById('whitelistFormWrapper');
+      const adminPanel = document.getElementById('whitelistAdminPanel');
+      const btnReturnForm = document.getElementById('btnReturnForm');
+      const btnViewApps = document.getElementById('btnViewApps');
+
+      formWrapper.classList.add('hidden');
+      adminPanel.classList.remove('hidden');
+      
+      btnViewApps.classList.add('hidden');
+      btnReturnForm.classList.remove('hidden');
+
+      renderWhitelistApplications();
+    }
+
+    function showWhitelistFormView() {
+      const formWrapper = document.getElementById('whitelistFormWrapper');
+      const adminPanel = document.getElementById('whitelistAdminPanel');
+      const btnReturnForm = document.getElementById('btnReturnForm');
+      const btnViewApps = document.getElementById('btnViewApps');
+
+      formWrapper.classList.remove('hidden');
+      adminPanel.classList.add('hidden');
+
+      btnReturnForm.classList.add('hidden');
+      btnViewApps.classList.remove('hidden');
+    }
+
+    function renderWhitelistApplications() {
+      const container = document.getElementById('whitelistApplicationsContainer');
+      const emptyState = document.getElementById('emptyWhitelistState');
+      container.innerHTML = '';
+
+      if (whitelistAppsData.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      whitelistAppsData.forEach(app => {
+        const card = document.createElement('div');
+        card.className = "glass-card rounded-2xl p-6 border border-slate-800 space-y-4";
+        
+        let statusBadge = '';
+        if (app.status === 'Pendiente') statusBadge = '<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold">Pendiente</span>';
+        else if (app.status === 'Aprobado') statusBadge = '<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold">Aprobado</span>';
+        else statusBadge = '<span class="px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold">Rechazado</span>';
+
+        let customHTML = '';
+        if (app.customAnswers && Object.keys(app.customAnswers).length > 0) {
+          customHTML += '<div class="border-t border-slate-800 pt-3 mt-3"><strong class="text-sky-400 text-xs">Test y Preguntas Dinámicas:</strong><ul class="mt-2 space-y-1 text-xs text-slate-300">';
+          for (const [qText, qAns] of Object.entries(app.customAnswers)) {
+            customHTML += `<li>• <strong>${escapeHTML(qText)}:</strong> ${escapeHTML(qAns)}</li>`;
+          }
+          customHTML += '</ul></div>';
+        }
+
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="text-white font-black text-base">${escapeHTML(app.charName)}</span>
+              <span class="text-xs text-slate-400">Discord: <strong class="text-sky-400">${escapeHTML(app.discord)}</strong></span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-500">${app.date}</span>
+              ${statusBadge}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-300">
+            <div><strong>Edad Real / IC:</strong> ${app.age} años / ${app.charAge} años</div>
+            <div><strong>Nacimiento:</strong> ${escapeHTML(app.charBirth)}</div>
+          </div>
+
+          <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-900 text-xs text-slate-300 space-y-2">
+            <div><strong class="text-sky-400">Lore del Personaje:</strong> ${escapeHTML(app.charLore)}</div>
+            <div><strong class="text-sky-400">Apariencia:</strong> ${escapeHTML(app.charApp)}</div>
+            ${customHTML}
+          </div>
+
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button onclick="setAppStatus('${app.id}', 'Aprobado')" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white font-bold text-xs transition-all">Aprobar</button>
+            <button onclick="setAppStatus('${app.id}', 'Rechazado')" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white font-bold text-xs transition-all">Rechazar</button>
+            <button onclick="deleteApp('${app.id}')" class="px-3 py-1.5 rounded-lg glass-card text-slate-400 hover:text-red-400 font-bold text-xs transition-all">Eliminar</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function setAppStatus(id, status) {
+      const app = whitelistAppsData.find(a => a.id === id);
+      if (app) {
+        app.status = status;
+        saveData();
+        renderWhitelistApplications();
+        updateWhitelistBadge();
+        showToast("Estado de solicitud actualizado a: " + status, "success");
+      }
+    }
+
+    function deleteApp(id) {
+      if (confirm("¿Eliminar esta solicitud del registro?")) {
+        whitelistAppsData = whitelistAppsData.filter(a => a.id !== id);
+        saveData();
+        renderWhitelistApplications();
+        updateWhitelistBadge();
+        showToast("Solicitud eliminada", "info");
+      }
+    }
+
+    function renderRules() {
+      const container = document.getElementById('rulesContainer');
+      const emptyState = document.getElementById('emptyRulesState');
+      const searchTerm = document.getElementById('rulesSearchInput').value.toLowerCase().trim();
+
+      container.innerHTML = '';
+
+      const filtered = rulesData.filter(rule => {
+        const matchesCat = (currentCategory === 'ALL' || rule.category === currentCategory);
+        const matchesSearch = rule.title.toLowerCase().includes(searchTerm) ||
+                              rule.code.toLowerCase().includes(searchTerm) ||
+                              rule.summary.toLowerCase().includes(searchTerm);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      filtered.forEach((rule) => {
+        const card = document.createElement('div');
+        card.className = "glass-card rounded-2xl border border-brand-border p-5 hover:border-brand-500/50 transition-all duration-300 tilt-card";
+        card.id = rule.id;
+
+        card.innerHTML = `
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer select-none" onclick="toggleAccordion('${rule.id}')">
+            <div class="flex items-start gap-4">
+              <span class="px-3 py-1.5 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-400 font-extrabold text-xs whitespace-nowrap mt-0.5">
+                ${escapeHTML(rule.code)}
+              </span>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-lg font-extrabold text-white">${escapeHTML(rule.title)}</h3>
+                  <span class="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/40">
+                    ${escapeHTML(rule.penalty)}
+                  </span>
+                </div>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1">${escapeHTML(rule.summary)}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-0 border-slate-800">
+              ${isAdminLoggedIn ? `
+                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                  <button onclick="editRule('${rule.id}')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all" title="Editar">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button onclick="deleteRule('${rule.id}')" class="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all" title="Eliminar">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              ` : ''}
+              
+              <span class="text-slate-400 text-xs font-bold flex items-center gap-2">
+                <i class="fa-solid fa-chevron-down transition-transform duration-300 text-brand-500" id="icon-${rule.id}"></i>
+              </span>
+            </div>
+          </div>
+
+          <div id="desc-${rule.id}" class="accordion-content">
+            <div class="pt-4 mt-4 border-t border-slate-800/80 text-slate-300 text-sm leading-relaxed space-y-3">
+              <p>${escapeHTML(rule.description)}</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleAccordion(id) {
+      const desc = document.getElementById(`desc-${id}`);
+      const icon = document.getElementById(`icon-${id}`);
+      if (desc && icon) {
+        if (desc.classList.contains('open')) {
+          desc.style.maxHeight = '0px';
+          desc.classList.remove('open');
+          icon.style.transform = 'rotate(0deg)';
+        } else {
+          desc.classList.add('open');
+          desc.style.maxHeight = desc.scrollHeight + 'px';
+          icon.style.transform = 'rotate(180deg)';
+        }
+      }
+    }
+
+    function setCategoryFilter(cat) {
+      currentCategory = cat;
+      const tabs = document.querySelectorAll('.category-tab');
+      tabs.forEach(tab => {
+        tab.classList.remove('active', 'border-brand-500', 'bg-brand-500', 'text-white', 'shadow-lg');
+        tab.classList.add('border-slate-800', 'glass-card', 'text-slate-400');
+      });
+      event.currentTarget.classList.add('active', 'border-brand-500', 'bg-brand-500', 'text-white', 'shadow-lg');
+      renderRules();
+    }
+
+    function filterRules() { renderRules(); }
+
+    function renderPatches() {
+      const container = document.getElementById('patchesContainer');
+      const emptyState = document.getElementById('emptyPatchesState');
+      container.innerHTML = '';
+
+      const filtered = patchesData.filter(p => currentPatchCategory === 'ALL' || p.category === currentPatchCategory);
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      filtered.forEach((patch) => {
+        const item = document.createElement('div');
+        item.className = "relative pl-8 sm:pl-16 group";
+
+        const categoryBadgeColor = patch.category === 'Major Update' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-brand-500/20 text-brand-400 border-brand-500/40';
+
+        item.innerHTML = `
+          <div class="absolute left-2.5 sm:left-6 top-6 -translate-x-1/2 w-4 h-4 rounded-full bg-slate-900 border-2 border-emerald-400 group-hover:scale-125 group-hover:bg-emerald-400 transition-all duration-300 shadow-md shadow-emerald-500/30"></div>
+
+          <div class="glass-card rounded-2xl border border-slate-800 p-6 sm:p-8 hover:border-emerald-500/50 transition-all duration-300 tilt-card">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-5">
+              <div>
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span class="px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-black text-xs">
+                    ${escapeHTML(patch.version)}
+                  </span>
+                  <span class="text-xs uppercase font-black px-2.5 py-0.5 rounded-full border ${categoryBadgeColor}">
+                    ${escapeHTML(patch.category)}
+                  </span>
+                  <span class="text-xs text-slate-400 font-medium">
+                    <i class="fa-regular fa-calendar-check mr-1 text-slate-500"></i> ${escapeHTML(patch.date)}
+                  </span>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-black text-white mt-2">${escapeHTML(patch.title)}</h3>
+              </div>
+
+              ${isAdminLoggedIn ? `
+                <div class="flex items-center gap-2">
+                  <button onclick="editPatch('${patch.id}')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-bold transition-all">
+                    <i class="fa-solid fa-pen mr-1"></i> Editar
+                  </button>
+                  <button onclick="deletePatch('${patch.id}')" class="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold transition-all">
+                    <i class="fa-solid fa-trash mr-1"></i> Eliminar
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="space-y-4 text-sm text-slate-300">
+              ${patch.added && patch.added.length > 0 ? `
+                <div>
+                  <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle"></i> Nuevas Características
+                  </h4>
+                  <ul class="space-y-1.5 pl-2">
+                    ${patch.added.map(a => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-emerald-400 font-bold">+</span> ${escapeHTML(a)}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+
+              ${patch.changed && patch.changed.length > 0 ? `
+                <div class="pt-2">
+                  <h4 class="text-xs font-black text-brand-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Cambios y Ajustes
+                  </h4>
+                  <ul class="space-y-1.5 pl-2">
+                    ${patch.changed.map(c => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-brand-400 font-bold">*</span> ${escapeHTML(c)}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+
+              ${patch.fixed && patch.fixed.length > 0 ? `
+                <div class="pt-2">
+                  <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-bug-slash"></i> Corrección de Errores
+                  </h4>
+                  <ul class="space-y-1.5 pl-2">
+                    ${patch.fixed.map(f => `<li class="flex items-start gap-2 text-xs sm:text-sm text-slate-300"><span class="text-amber-400 font-bold">-</span> ${escapeHTML(f)}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function setPatchCategoryFilter(cat) {
+      currentPatchCategory = cat;
+      document.querySelectorAll('.patch-tab').forEach(tab => {
+        tab.classList.remove('active', 'border-emerald-500', 'bg-emerald-500', 'text-white', 'shadow-lg');
+        tab.classList.add('border-slate-800', 'glass-card', 'text-slate-400');
+      });
+      event.currentTarget.classList.add('active', 'border-emerald-500', 'bg-emerald-500', 'text-white', 'shadow-lg');
+      renderPatches();
+    }
+
+    function toggleAdminModal() {
+      if (isAdminLoggedIn) {
+        if (confirm("¿Cerrar sesión del Modo Staff?")) {
+          isAdminLoggedIn = false;
+          updateAdminUI();
+          showToast("Sesión de Staff cerrada", "info");
+        }
+      } else {
+        const modal = document.getElementById('adminPasswordModal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+        document.getElementById('adminPasswordInput').value = "";
+        document.getElementById('adminLoginError').classList.add('hidden');
+      }
+    }
+
+    function closeAdminModal() {
+      const modal = document.getElementById('adminPasswordModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const pwd = document.getElementById('adminPasswordInput').value;
+      if (pwd === 'admin123') {
+        isAdminLoggedIn = true;
+        closeAdminModal();
+        updateAdminUI();
+        showToast("¡Modo Staff activado con éxito!", "success");
+      } else {
+        document.getElementById('adminLoginError').classList.remove('hidden');
+      }
+    }
+
+    function updateAdminUI() {
+      const btnText = document.getElementById('adminBtnText');
+      const icon = document.getElementById('adminIcon');
+      const toggleBtn = document.getElementById('adminToggleBtn');
+      
+      const addRuleBtn = document.getElementById('addRuleBtn');
+      const resetRulesBtn = document.getElementById('resetRulesBtn');
+      const addPatchBtn = document.getElementById('addPatchBtn');
+      const resetPatchesBtn = document.getElementById('resetPatchesBtn');
+      const addFeatureImageBtn = document.getElementById('addFeatureImageBtn');
+      const staffWlToolbar = document.getElementById('staffWhitelistToolbar');
+
+      if (isAdminLoggedIn) {
+        btnText.textContent = "Staff Activo";
+        icon.className = "fa-solid fa-shield-check text-emerald-400 text-sm";
+        toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:scale-105 active:scale-95";
+
+        if(addRuleBtn) addRuleBtn.classList.remove('hidden');
+        if(resetRulesBtn) resetRulesBtn.classList.remove('hidden');
+        if(addPatchBtn) addPatchBtn.classList.remove('hidden');
+        if(resetPatchesBtn) resetPatchesBtn.classList.remove('hidden');
+        if(addFeatureImageBtn) addFeatureImageBtn.classList.remove('hidden');
+        if(staffWlToolbar) staffWlToolbar.classList.remove('hidden');
+      } else {
+        btnText.textContent = "Modo Staff";
+        icon.className = "fa-solid fa-user-shield text-brand-500 text-sm";
+        toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-slate-700 bg-slate-900/80 text-slate-300 hover:border-brand-500 hover:text-white hover:scale-105 active:scale-95";
+
+        if(addRuleBtn) addRuleBtn.classList.add('hidden');
+        if(resetRulesBtn) resetRulesBtn.classList.add('hidden');
+        if(addPatchBtn) addPatchBtn.classList.add('hidden');
+        if(resetPatchesBtn) resetPatchesBtn.classList.add('hidden');
+        if(addFeatureImageBtn) addFeatureImageBtn.classList.add('hidden');
+        if(staffWlToolbar) staffWlToolbar.classList.add('hidden');
+
+        showWhitelistFormView();
+      }
+
+      renderRules();
+      renderPatches();
+      switchFeatureTab(currentFeatureTab);
+      renderWhitelistFormBuilder();
+    }
+
+    function openRuleModal() {
+      if (!isAdminLoggedIn) return;
+      const modal = document.getElementById('ruleFormModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('modalFormTitle').textContent = "Agregar Nueva Normativa";
+      document.getElementById('ruleEditId').value = "";
+      document.getElementById('ruleCodeInput').value = "";
+      document.getElementById('ruleTitleInput').value = "";
+      document.getElementById('ruleSummaryInput').value = "";
+      document.getElementById('ruleDescriptionInput').value = "";
+    }
+
+    function editRule(id) {
+      if (!isAdminLoggedIn) return;
+      const rule = rulesData.find(r => r.id === id);
+      if (!rule) return;
+
+      const modal = document.getElementById('ruleFormModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+
+      document.getElementById('modalFormTitle').textContent = "Editar Normativa";
+      document.getElementById('ruleEditId').value = rule.id;
+      document.getElementById('ruleCodeInput').value = rule.code;
+      document.getElementById('ruleCategoryInput').value = rule.category;
+      document.getElementById('ruleTitleInput').value = rule.title;
+      document.getElementById('rulePenaltyInput').value = rule.penalty;
+      document.getElementById('ruleSummaryInput').value = rule.summary;
+      document.getElementById('ruleDescriptionInput').value = rule.description;
+    }
+
+    function closeRuleModal() {
+      const modal = document.getElementById('ruleFormModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function saveRule(e) {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const editId = document.getElementById('ruleEditId').value;
+      const ruleObj = {
+        id: editId || ('rule-' + Date.now()),
+        code: document.getElementById('ruleCodeInput').value.trim(),
+        category: document.getElementById('ruleCategoryInput').value,
+        title: document.getElementById('ruleTitleInput').value.trim(),
+        penalty: document.getElementById('rulePenaltyInput').value,
+        summary: document.getElementById('ruleSummaryInput').value.trim(),
+        description: document.getElementById('ruleDescriptionInput').value.trim()
+      };
+
+      if (editId) {
+        const index = rulesData.findIndex(r => r.id === editId);
+        if (index !== -1) rulesData[index] = ruleObj;
+        showToast("Normativa actualizada correctamente", "success");
+      } else {
+        rulesData.unshift(ruleObj);
+        showToast("Nueva normativa añadida", "success");
+      }
+
+      saveData();
+      renderRules();
+      closeRuleModal();
+    }
+
+    function deleteRule(id) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Estás seguro de eliminar esta normativa?")) {
+        rulesData = rulesData.filter(r => r.id !== id);
+        saveData();
+        renderRules();
+        showToast("Normativa eliminada", "info");
+      }
+    }
+
+    function confirmResetRules() {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Deseas restablecer las normativas a sus valores predeterminados?")) {
+        rulesData = [...DEFAULT_RULES];
+        saveData();
+        renderRules();
+        showToast("Normativas restablecidas", "info");
+      }
+    }
+
+    function openPatchModal() {
+      if (!isAdminLoggedIn) return;
+      const modal = document.getElementById('patchFormModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+      document.getElementById('patchModalTitle').textContent = "Publicar Notas de Parche";
+      document.getElementById('patchEditId').value = "";
+      document.getElementById('patchVersionInput').value = "";
+      document.getElementById('patchDateInput').value = "";
+      document.getElementById('patchTitleInput').value = "";
+      document.getElementById('patchAddedInput').value = "";
+      document.getElementById('patchChangedInput').value = "";
+      document.getElementById('patchFixedInput').value = "";
+    }
+
+    function editPatch(id) {
+      if (!isAdminLoggedIn) return;
+      const patch = patchesData.find(p => p.id === id);
+      if (!patch) return;
+
+      const modal = document.getElementById('patchFormModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => modal.classList.remove('opacity-0', 'scale-95'), 10);
+
+      document.getElementById('patchModalTitle').textContent = "Editar Notas de Parche";
+      document.getElementById('patchEditId').value = patch.id;
+      document.getElementById('patchVersionInput').value = patch.version;
+      document.getElementById('patchDateInput').value = patch.date;
+      document.getElementById('patchCategoryInput').value = patch.category;
+      document.getElementById('patchTitleInput').value = patch.title;
+      document.getElementById('patchAddedInput').value = (patch.added || []).join('\n');
+      document.getElementById('patchChangedInput').value = (patch.changed || []).join('\n');
+      document.getElementById('patchFixedInput').value = (patch.fixed || []).join('\n');
+    }
+
+    function closePatchModal() {
+      const modal = document.getElementById('patchFormModal');
+      modal.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function savePatch(e) {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const editId = document.getElementById('patchEditId').value;
+      const addedLines = document.getElementById('patchAddedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const changedLines = document.getElementById('patchChangedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const fixedLines = document.getElementById('patchFixedInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+      const patchObj = {
+        id: editId || ('patch-' + Date.now()),
+        version: document.getElementById('patchVersionInput').value.trim(),
+        date: document.getElementById('patchDateInput').value.trim(),
+        category: document.getElementById('patchCategoryInput').value,
+        title: document.getElementById('patchTitleInput').value.trim(),
+        added: addedLines,
+        changed: changedLines,
+        fixed: fixedLines
+      };
+
+      if (editId) {
+        const index = patchesData.findIndex(p => p.id === editId);
+        if (index !== -1) patchesData[index] = patchObj;
+        showToast("Notas de parche actualizadas", "success");
+      } else {
+        patchesData.unshift(patchObj);
+        showToast("Notas de parche publicadas", "success");
+      }
+
+      saveData();
+      renderPatches();
+      closePatchModal();
+    }
+
+    function deletePatch(id) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Estás seguro de eliminar estas notas de parche?")) {
+        patchesData = patchesData.filter(p => p.id !== id);
+        saveData();
+        renderPatches();
+        showToast("Parche eliminado", "info");
+      }
+    }
+
+    function confirmResetPatches() {
+      if (!isAdminLoggedIn) return;
+      if (confirm("¿Restablecer las notas de parche por defecto?")) {
+        patchesData = [...DEFAULT_PATCHES];
+        saveData();
+        renderPatches();
+        showToast("Parches restablecidos", "info");
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let bg = "bg-emerald-600/90 border-emerald-500 text-white";
+      let icon = "fa-circle-check";
+      if (type === 'info') {
+        bg = "bg-brand-600/90 border-brand-500 text-white";
+        icon = "fa-circle-info";
+      } else if (type === 'error') {
+        bg = "bg-red-600/90 border-red-500 text-white";
+        icon = "fa-triangle-exclamation";
+      }
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl flex items-center gap-3 text-xs font-extrabold backdrop-blur-md transition-all duration-300 translate-y-4 opacity-0 ${bg}`;
+      toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i> <span>${escapeHTML(message)}</span>`;
+      
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+  </script>
 </body>
 </html>
