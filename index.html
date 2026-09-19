@@ -855,7 +855,7 @@
           status: 'pending',
           createdAt: serverTimestamp()
         });
-        window.showToast("¡Solicitud enviada a Firebase con éxito! El Staff la revisará.", "success");
+        window.showToast("¡Solicitud enviada con éxito! El Staff la revisará.", "success");
         document.getElementById('whitelistForm').reset();
         window.navigateTo('inicio');
       } catch (error) {
@@ -864,7 +864,7 @@
       }
     };
 
-    // Cargar Solicitudes desde Firestore para el Panel Staff
+    // Cargar Solicitudes para el Panel Staff
     window.fetchWhitelistAppsFromFirebase = async function() {
       try {
         const querySnapshot = await getDocs(collection(db, "whitelist_applications"));
@@ -880,7 +880,7 @@
       }
     };
 
-    // Actualizar Estado de Solicitud en Firebase (Aprobada / Rechazada)
+    // Actualizar Estado de Solicitud (Aprobada / Rechazada)
     window.updateWhitelistAppStatusFirebase = async function(id, newStatus) {
       try {
         const docRef = doc(db, "whitelist_applications", id);
@@ -904,7 +904,7 @@
         const userDocRef = doc(db, "staff_users", user.uid);
         const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists() && userDoc.data().role === "admin") {
+       if (userDoc.exists()) {
           window.isAdminLoggedIn = true;
           window.closeAdminModal();
           window.updateAdminUI();
@@ -1730,64 +1730,40 @@
       setTimeout(() => modal.classList.add('hidden'), 300);
     }
 
-    function handleAdminLoginRouter(e) {
-      e.preventDefault();
-      const email = document.getElementById('adminEmailInput').value.trim();
-      const pass = document.getElementById('adminPasswordInput').value;
-
-      if (pass === 'admin123') {
-        isAdminLoggedIn = true;
-        closeAdminModal();
-        updateAdminUI();
-        showToast("¡Modo Staff activado con éxito!", "success");
-      } else if (email) {
-        window.handleFirebaseAdminLogin(email, pass);
-      } else {
-        document.getElementById('adminLoginError').classList.remove('hidden');
-      }
-    }
-
-    function updateAdminUI() {
-      const adminBtnText = document.getElementById('adminBtnText');
-      const adminIcon = document.getElementById('adminIcon');
-      const adminToggleBtn = document.getElementById('adminToggleBtn');
-      const addRuleBtn = document.getElementById('addRuleBtn');
-      const resetRulesBtn = document.getElementById('resetRulesBtn');
-      const addPatchBtn = document.getElementById('addPatchBtn');
-      const resetPatchesBtn = document.getElementById('resetPatchesBtn');
-      const staffWhitelistToolbar = document.getElementById('staffWhitelistToolbar');
-      const addFeatureImageBtn = document.getElementById('addFeatureImageBtn');
-
-      if (isAdminLoggedIn) {
-        adminBtnText.textContent = "Staff Activo";
-        adminIcon.className = "fa-solid fa-user-shield text-emerald-400 text-sm";
-        adminToggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-emerald-500/60 bg-emerald-950/40 text-emerald-300 hover:scale-105 active:scale-95";
+    window.handleFirebaseAdminLogin = async function(emailInput, passInput) {
+    try {
+        // Hacemos una consulta a la colección 'staff_users' buscando coincidencia exacta
+        const staffRef = collection(db, "staff_users");
+        const q = query(
+            staffRef, 
+            where("email", "==", emailInput), 
+            where("password", "==", passInput)
+        );
         
-        if (addRuleBtn) addRuleBtn.classList.remove('hidden');
-        if (resetRulesBtn) resetRulesBtn.classList.remove('hidden');
-        if (addPatchBtn) addPatchBtn.classList.remove('hidden');
-        if (resetPatchesBtn) resetPatchesBtn.classList.remove('hidden');
-        if (staffWhitelistToolbar) staffWhitelistToolbar.classList.remove('hidden');
-        if (addFeatureImageBtn) addFeatureImageBtn.classList.remove('hidden');
-      } else {
-        adminBtnText.textContent = "Modo Staff";
-        adminIcon.className = "fa-solid fa-user-shield text-brand-500 text-sm";
-        adminToggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all duration-300 flex items-center gap-2 border-slate-700 bg-slate-900/80 text-slate-300 hover:border-brand-500 hover:text-white hover:scale-105 active:scale-95";
+        const querySnapshot = await getDocs(q);
 
-        if (addRuleBtn) addRuleBtn.classList.add('hidden');
-        if (resetRulesBtn) resetRulesBtn.classList.add('hidden');
-        if (addPatchBtn) addPatchBtn.classList.add('hidden');
-        if (resetPatchesBtn) resetPatchesBtn.classList.add('hidden');
-        if (staffWhitelistToolbar) staffWhitelistToolbar.classList.add('hidden');
-        if (addFeatureImageBtn) addFeatureImageBtn.classList.add('hidden');
-        showWhitelistFormView();
-      }
-
-      renderRules();
-      renderPatches();
-      renderWhitelistFormBuilder();
-      switchFeatureTab(currentFeatureTab);
+        // Verificamos si encontró algún documento que coincida
+        if (!querySnapshot.empty) {
+            // ¡Acceso concedido!
+            isAdminLoggedIn = true;
+            closeAdminModal();
+            updateAdminUI();
+            showToast("¡Modo Staff activado con éxito!", "success");
+            
+            // Llama a las funciones que cargan los datos de tu panel
+            if (typeof window.fetchWhitelistAppsFromFirebase === 'function') {
+                window.fetchWhitelistAppsFromFirebase();
+            }
+        } else {
+            // Si no coincide el correo o la contraseña en la base de datos
+            document.getElementById('adminLoginError').classList.remove('hidden');
+            showToast("Correo o contraseña incorrectos", "error");
+        }
+    } catch (error) {
+        console.error("Error al verificar las credenciales en Firebase:", error);
+        document.getElementById('adminLoginError').classList.remove('hidden');
     }
+};
 
     // Funciones de Whitelist y Formulario Dinámico
     function renderWhitelistFormBuilder() {
